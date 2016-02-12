@@ -1,5 +1,4 @@
 DEPS = $(shell go list -f '{{range .TestImports}}{{.}} {{end}}' ./...)
-PACKAGES = $(shell go list ./...)
 VETARGS?=-asmdecl -atomic -bool -buildtags -copylocks -methods \
          -nilfunc -printf -rangeloops -shift -structtags -unsafeptr
 all: test
@@ -33,4 +32,4 @@ vet:
 	fi
 
 
-.PHONY: all  deps test vet
+.PHONY: all deps test vet
