@@ -26,7 +26,7 @@ type ReleaseProject struct {
 	ContentRoot string `json:"content_root"`
 	Email       string `json:"email"`
 	Description string `json:"description"`
-	Url         string `json:"url"`
+	ScmUrl      string `json:"url"`
 }
 
 type ReleaseMeta struct {

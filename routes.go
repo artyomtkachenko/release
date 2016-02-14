@@ -20,7 +20,7 @@ var routes = Routes{
 	},
 	Route{
 		"DoBuild",
-		"POST",
+		"PUT",
 		"/v1/build/{buildId}",
 		DoBuild,
 	},
