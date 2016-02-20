@@ -40,7 +40,7 @@ func ConvertJSON2RpmSpec(rm ReleaseMeta, tmp TmpDir) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 
-	specDir := filepath.Join(tmp.Path, "SPEC")
+	specDir := filepath.Join(Conf.DataDir, tmp.Path, "SPEC")
 	specFile := filepath.Join(specDir, rm.Project.Name)
 	if err := os.Mkdir(specDir, 0755); err != nil {
 		return err

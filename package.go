@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
@@ -19,8 +20,9 @@ func init() {
 func CreateTmpDir(rm ReleaseMeta) (TmpDir, error) {
 	uniqNumber := rand.Intn(9000000000)
 	buildPath := rm.Name + strconv.Itoa(uniqNumber)
+	fullBuildPath := filepath.Join(Conf.DataDir, buildPath)
 
-	if err := os.Mkdir(buildPath, 0755); err != nil {
+	if err := os.MkdirAll(fullBuildPath, 0755); err != nil {
 		return TmpDir{Path: ""}, errors.New(err.Error())
 	}
 

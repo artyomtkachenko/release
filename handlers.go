@@ -39,6 +39,7 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		ThrowError(w, 422, err.Error())
 	}
 	//TODO KILLME
+	fmt.Printf("%+v\n", Conf)
 	fmt.Printf("%+v\n", releaseMeta)
 	//Validates input
 	if err := validateInput(releaseMeta); err != nil {
@@ -53,11 +54,12 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//if releaseMeta,Package.Type == "rhel" {
-	if err := ConvertJSON2RpmSpec(releaseMeta, path); err != nil {
-		panic(err)
+	if releaseMeta.Package.Type == "rpm" {
+		err := ConvertJSON2RpmSpec(releaseMeta, path)
+		if err != nil {
+			panic(err)
+		}
 	}
-	//}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(path); err != nil {
@@ -65,7 +67,7 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-//Gets ZIP file and extracts it under the predefined location
+//Gets ZIP stream and extracts it under the predefined location
 func DoBuild(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	buildId := vars["buildId"]
