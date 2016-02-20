@@ -1,4 +1,4 @@
-package main
+package meta
 
 type Deploy struct {
 	User    string `json:"user" yaml:"user"`

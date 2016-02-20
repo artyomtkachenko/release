@@ -2,6 +2,7 @@ package validate
 
 import (
 	"errors"
+	"github.com/artyomtkachenko/release/meta"
 	"regexp"
 )
 

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/artyomtkachenko/release/meta"
 	"github.com/artyomtkachenko/release/validate"
 	"github.com/gorilla/mux"
 	"io"
@@ -28,7 +29,7 @@ func ThrowError(w http.ResponseWriter, code int, text string) {
 
 //Initialize the build.
 func DoInit(w http.ResponseWriter, req *http.Request) {
-	var releaseMeta ReleaseMeta
+	var releaseMeta meta.ReleaseMeta
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, req.ContentLength))
 	if err != nil {
 		panic(err)
