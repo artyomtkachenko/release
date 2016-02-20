@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/artyomtkachenko/release/validate"
 	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
@@ -42,7 +43,7 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	fmt.Printf("%+v\n", Conf)
 	fmt.Printf("%+v\n", releaseMeta)
 	//Validates input
-	if err := validateInput(releaseMeta); err != nil {
+	if err := validate.Input(releaseMeta); err != nil {
 		ThrowError(w, 422, err.Error())
 		return
 	}
