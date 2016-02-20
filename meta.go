@@ -8,11 +8,11 @@ type Deploy struct {
 
 type Package struct {
 	Sign bool   `json:"sign"`
-	Type string `json:"package_type"`
+	Type string `json:"type"`
 }
 
 type Publish struct {
-	Type        string `json:"publish_type"`
+	Type        string `json:"type"`
 	Destination string `json:"destination"`
 }
 
@@ -23,10 +23,11 @@ type Scripts struct {
 
 type Project struct {
 	Name        string `json:"name"`
-	ContentRoot string `json:"content_root"`
+	BuildRoot   string `json:"build_root"`
 	Email       string `json:"email"`
 	Description string `json:"description"`
 	ScmUrl      string `json:"url"`
+	Version     string `json:"version"`
 }
 
 type ReleaseMeta struct {

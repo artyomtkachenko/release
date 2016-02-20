@@ -52,6 +52,12 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		ThrowError(w, 500, err.Error())
 		return
 	}
+
+	//if releaseMeta,Package.Type == "rhel" {
+	if err := ConvertJSON2RpmSpec(releaseMeta, path); err != nil {
+		panic(err)
+	}
+	//}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(path); err != nil {
