@@ -1,0 +1,26 @@
+{
+  "project": {
+    "name": "foo",
+    "content_root": "/foo/bar",
+    "email": "fo@bar.com",
+    "description": "blah",
+    "url": "http://foobar.com"
+  },
+  "scripts": {
+    "before_remove": "none",
+    "after_install": "none"
+  },
+  "publish": {
+    "destination": "http://foobar.com",
+    "publish_type": "webdav"
+  },
+  "package": {
+    "package_type": "rpm",
+    "sign": false
+  },
+  "deploy": {
+    "user": "obama",
+    "group": "madhouse",
+    "root_dir": "/myapp"
+  }
+}

@@ -1,27 +1,27 @@
 package main
 
-type ReleaseDeploy struct {
+type Deploy struct {
 	User    string `json:"user"`
 	Group   string `json:"group"`
 	RootDir string `json:"root_dir"`
 }
 
-type ReleasePackage struct {
-	Sign bool   `json:"root_dir"`
+type Package struct {
+	Sign bool   `json:"sign"`
 	Type string `json:"package_type"`
 }
 
-type ReleasePublish struct {
+type Publish struct {
 	Type        string `json:"publish_type"`
 	Destination string `json:"destination"`
 }
 
-type ReleaseScripts struct {
+type Scripts struct {
 	BeforeRemove string `json:"before_remove"`
 	AfterInstall string `json:"after_install"`
 }
 
-type ReleaseProject struct {
+type Project struct {
 	Name        string `json:"name"`
 	ContentRoot string `json:"content_root"`
 	Email       string `json:"email"`
@@ -30,9 +30,9 @@ type ReleaseProject struct {
 }
 
 type ReleaseMeta struct {
-	ReleaseProject
-	ReleaseDeploy
-	ReleasePackage
-	ReleasePublish
-	ReleaseScripts
+	Project `json:"project"`
+	Deploy  `json:"deploy"`
+	Package `json:"package"`
+	Publish `json:"publish"`
+	Scripts `json:"scripts"`
 }

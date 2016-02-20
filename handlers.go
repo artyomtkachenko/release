@@ -8,8 +8,20 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"fmt"
 )
 
+func ThrowError(w http.ResponseWriter, code int, text string)  {
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(code)
+	e := jsonErr{
+		Code: code,
+		Text: text,
+	}
+	if err := json.NewEncoder(w).Encode(e); err != nil {
+		panic(err)
+	}
+}
 //Initialize the build.
 func DoInit(w http.ResponseWriter, req *http.Request) {
 	var releaseMeta ReleaseMeta
@@ -21,17 +33,25 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 	if err := json.Unmarshal(body, &releaseMeta); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422) // unprocessable entity
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
+	  ThrowError(w, 422, err.Error())
+	}
+ //TODO KILLME
+	fmt.Printf("%+v\n", releaseMeta)
+  //Validates input
+	if err := validateInput(releaseMeta); err != nil {
+    ThrowError(w, 422, err.Error())
+		return
 	}
 
-	t := CreateTmpDir(releaseMeta)
+  //Creates temorary build directory
+	path, err := CreateTmpDir(releaseMeta)
+	if err != nil {
+		ThrowError(w, 500, err.Error())
+		return
+	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(t); err != nil {
+	if err := json.NewEncoder(w).Encode(path); err != nil {
 		panic(err)
 	}
 }
