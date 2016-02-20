@@ -1,10 +1,11 @@
 package main
+
 import (
-	"os"
-	"math/rand"
-	"time"
-	"strconv"
 	"errors"
+	"math/rand"
+	"os"
+	"strconv"
+	"time"
 )
 
 type tmpDir struct {
@@ -16,12 +17,12 @@ func init() {
 }
 
 func CreateTmpDir(rm ReleaseMeta) (tmpDir, error) {
-  uniqNumber := rand.Intn(9000000000)
-	buildPath := "C:\\release\\" + rm.Name + strconv.Itoa(uniqNumber)
+	uniqNumber := rand.Intn(9000000000)
+	buildPath := rm.Name + strconv.Itoa(uniqNumber)
 
-  if err := os.Mkdir(buildPath, 0755); err != nil {
-    return tmpDir{Path: ""}, errors.New(err.Error())
+	if err := os.Mkdir(buildPath, 0755); err != nil {
+		return tmpDir{Path: ""}, errors.New(err.Error())
 	}
 
-	return tmpDir{Path: buildPath}, nil
+	return tmpDir{Path: rm.Name + strconv.Itoa(uniqNumber)}, nil
 }

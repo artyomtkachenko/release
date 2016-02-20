@@ -4,14 +4,16 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"fmt"
+	"path/filepath"
 )
 
-func ThrowError(w http.ResponseWriter, code int, text string)  {
+func ThrowError(w http.ResponseWriter, code int, text string) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(code)
 	e := jsonErr{
@@ -22,6 +24,7 @@ func ThrowError(w http.ResponseWriter, code int, text string)  {
 		panic(err)
 	}
 }
+
 //Initialize the build.
 func DoInit(w http.ResponseWriter, req *http.Request) {
 	var releaseMeta ReleaseMeta
@@ -33,17 +36,17 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		panic(err)
 	}
 	if err := json.Unmarshal(body, &releaseMeta); err != nil {
-	  ThrowError(w, 422, err.Error())
+		ThrowError(w, 422, err.Error())
 	}
- //TODO KILLME
+	//TODO KILLME
 	fmt.Printf("%+v\n", releaseMeta)
-  //Validates input
+	//Validates input
 	if err := validateInput(releaseMeta); err != nil {
-    ThrowError(w, 422, err.Error())
+		ThrowError(w, 422, err.Error())
 		return
 	}
 
-  //Creates temorary build directory
+	//Creates temorary build directory
 	path, err := CreateTmpDir(releaseMeta)
 	if err != nil {
 		ThrowError(w, 500, err.Error())
@@ -58,28 +61,41 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 
 //Gets ZIP file and extracts it under the predefined location
 func DoBuild(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	buildId := vars["buildId"]
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		panic(err)
 	}
 
-	r, err := zip.NewReader(bytes.NewReader(body), req.ContentLength)
+	archive, err := zip.NewReader(bytes.NewReader(body), req.ContentLength)
 	if err != nil {
 		panic(err)
 	}
 
-	for _, zf := range r.File {
-		dst, err := os.Create(zf.Name)
-		if err != nil {
-			panic(err)
-		}
-		defer dst.Close()
-		src, err := zf.Open()
-		if err != nil {
-			panic(err)
-		}
-		defer src.Close()
+	for _, zf := range archive.File {
+		dst := filepath.Join(buildId, "build")
+		path := filepath.Join(dst, zf.Name)
 
-		io.Copy(dst, src)
+		if zf.FileInfo().IsDir() {
+			os.MkdirAll(path, zf.Mode())
+			continue
+		}
+
+		fileReader, err := zf.Open()
+		if err != nil {
+			panic(err)
+		}
+		defer fileReader.Close()
+
+		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, zf.Mode())
+		if err != nil {
+			panic(err)
+		}
+		defer targetFile.Close()
+
+		if _, err := io.Copy(targetFile, fileReader); err != nil {
+			panic(err)
+		}
 	}
 }
