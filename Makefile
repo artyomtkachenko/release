@@ -3,18 +3,11 @@ VETARGS?=-asmdecl -atomic -bool -buildtags -copylocks -methods \
          -nilfunc -printf -rangeloops -shift -structtags -unsafeptr
 all: test
 
-test: deps
-	@sh -c "'$(PWD)/scripts/test.sh'"
-	@$(MAKE) vet
+deps: 
+	@go get -u github.com/artyomtkachenko/release
 
-deps:
-	@echo "--> Installing build dependencies"
-	# @DEP_ARGS="-d -v" sh -c "'$(PWD)/scripts/deps.sh'"
-
-
-updatedeps: deps
-	@echo "--> Updating build dependencies"
-	# @DEP_ARGS="-d -f -u" sh -c "'$(PWD)/scripts/deps.sh'"
+test: 
+	@go test
 
 vet:
 	@go tool vet 2>/dev/null ; if [ $$? -eq 3 ]; then \

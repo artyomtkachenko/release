@@ -37,7 +37,7 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 	}
 
 	tmpId := TmpDir{Path: "aaa"}
-	err := ConvertJSON2RpmSpec(m, conf, tmpId)
+	err := GenerateRpmSpec(m, conf, tmpId)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}

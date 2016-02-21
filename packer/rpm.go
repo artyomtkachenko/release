@@ -30,7 +30,7 @@ BuildRoot: {{ .Project.BuildRoot }}
 )
 
 //Converts JSON object into RPM spec file
-func ConvertJSON2RpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error {
+func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 

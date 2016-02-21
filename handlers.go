@@ -58,9 +58,9 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if releaseMeta.Package.Type == "rpm" {
-		err := packer.ConvertJSON2RpmSpec(releaseMeta, Config, path)
+		err := packer.GenerateRpmSpec(releaseMeta, Config, path)
 		if err != nil {
-			panic(err)
+			ThrowError(w, 400, err.Error())
 		}
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -76,12 +76,12 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	buildId := vars["buildId"]
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		panic(err)
+		ThrowError(w, 400, err.Error())
 	}
 
 	archive, err := zip.NewReader(bytes.NewReader(body), req.ContentLength)
 	if err != nil {
-		panic(err)
+		ThrowError(w, 400, err.Error())
 	}
 
 	for _, zf := range archive.File {
@@ -95,17 +95,20 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 
 		fileReader, err := zf.Open()
 		if err != nil {
+			ThrowError(w, 400, err.Error())
 			panic(err)
 		}
 		defer fileReader.Close()
 
 		targetFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, zf.Mode())
 		if err != nil {
+			ThrowError(w, 400, err.Error())
 			panic(err)
 		}
 		defer targetFile.Close()
 
 		if _, err := io.Copy(targetFile, fileReader); err != nil {
+			ThrowError(w, 400, err.Error())
 			panic(err)
 		}
 	}
