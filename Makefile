@@ -5,9 +5,13 @@ all: test
 
 deps: 
 	@go get -u github.com/artyomtkachenko/release
+	@go get -u github.com/gorilla/mux
 
-test: 
-	@go test
+test: vet 
+	@go test ./...
+
+build: test 
+	@go build .
 
 vet:
 	@go tool vet 2>/dev/null ; if [ $$? -eq 3 ]; then \
@@ -20,9 +24,4 @@ vet:
 		echo "and fix them if necessary before submitting the code for review."; \
 	fi
 
-	@git grep -n `echo "log"".Print"` ; if [ $$? -eq 0 ]; then \
-		echo "[LINT] Found "log"".Printf" calls. These should use Nomad's logger instead."; \
-	fi
-
-
-.PHONY: all deps test vet
+.PHONY: all deps test build vet
