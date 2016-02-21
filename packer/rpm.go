@@ -43,7 +43,7 @@ func ConvertJSON2RpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) er
 
 	specDir := filepath.Join(conf.DataDir, tmp.Path, "SPEC")
 	specFile := filepath.Join(specDir, rm.Project.Name)
-	if err := os.Mkdir(specDir, 0755); err != nil {
+	if err := os.MkdirAll(specDir, 0755); err != nil {
 		return err
 	}
 

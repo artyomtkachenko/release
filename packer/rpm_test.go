@@ -4,11 +4,10 @@ import (
 	"github.com/artyomtkachenko/release/config"
 	"github.com/artyomtkachenko/release/meta"
 	"os"
-	"path/filepath"
 	"testing"
 )
 
-func TestCreateTmpDir(t *testing.T) {
+func TestConvertJSON2RpmSpec(t *testing.T) {
 	conf := config.Config{
 		DataDir: "/tmp",
 	}
@@ -37,11 +36,11 @@ func TestCreateTmpDir(t *testing.T) {
 		},
 	}
 
-	tmpPath, err := CreateTmpDir(m, conf)
+	tmpId := TmpDir{Path: "aaa"}
+	err := ConvertJSON2RpmSpec(m, conf, tmpId)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
-	fullPath := filepath.Join(conf.DataDir, tmpPath.Path)
-	defer os.Remove(fullPath)
+	defer os.RemoveAll("/tmp/aaa")
 }
