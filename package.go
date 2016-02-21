@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/artyomtkachenko/release/meta"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -17,7 +18,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-func CreateTmpDir(rm ReleaseMeta) (TmpDir, error) {
+func CreateTmpDir(rm meta.ReleaseMeta) (TmpDir, error) {
 	uniqNumber := rand.Intn(9000000000)
 	buildPath := rm.Name + strconv.Itoa(uniqNumber)
 	fullBuildPath := filepath.Join(Conf.DataDir, buildPath)

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"github.com/artyomtkachenko/release/meta"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -36,7 +37,7 @@ Requires:
 )
 
 //Converts JSON object into RPM spec file
-func ConvertJSON2RpmSpec(rm ReleaseMeta, tmp TmpDir) error {
+func ConvertJSON2RpmSpec(rm meta.ReleaseMeta, tmp TmpDir) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 
