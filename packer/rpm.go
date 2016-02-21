@@ -13,26 +13,19 @@ const (
 Name: {{ .Project.Name }}
 Version: {{ .Project.Version }}        
 Release:        1%{?dist}
-Summary:        
+Summary: {{ .Project.Description }}        
 Packager: Santa Claus <sclaus@northpole.com>
 
 Group: {{ .Project.Email }}           
 License: Private        
 URL: {{ .Project.ScmUrl }}            
-Source0:        
 BuildRoot: {{ .Project.BuildRoot }}
-
-BuildRequires:  
-Requires:       
 
 %description
 {{ .Project.Description }}
 
 %files
 %defattr(-,{{ .Deploy.User }},{{ .Deploy.Group }},-)
-%doc
-
-%changelog
 `
 )
 

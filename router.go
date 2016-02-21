@@ -5,8 +5,32 @@ import (
 	"net/http"
 )
 
+type Route struct {
+	Name        string
+	Method      string
+	Pattern     string
+	HandlerFunc http.HandlerFunc
+}
+
+type Routes []Route
+
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
+	routes := Routes{
+		Route{
+			Name:        "DoInit",
+			Method:      "POST",
+			Pattern:     "/v1/init/rhel",
+			HandlerFunc: DoInit,
+		},
+		Route{
+			Name:        "DoBuild",
+			Method:      "PUT",
+			Pattern:     "/v1/build/{buildId}",
+			HandlerFunc: DoBuild,
+		},
+	}
+
 	for _, route := range routes {
 		var handler http.Handler
 

@@ -58,7 +58,7 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if releaseMeta.Package.Type == "rpm" {
-		err := packer.ConvertJSON2RpmSpec(releaseMeta, path, Config)
+		err := packer.ConvertJSON2RpmSpec(releaseMeta, Config, path)
 		if err != nil {
 			panic(err)
 		}
@@ -85,8 +85,8 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	}
 
 	for _, zf := range archive.File {
-		dst := filepath.Join(buildId, "build")
-		path := filepath.Join(dst, zf.Name)
+		dst := filepath.Join(Config.DataDir, buildId, "BUILD")
+		path := filepath.Join(dst, zf.Name, ".spec")
 
 		if zf.FileInfo().IsDir() {
 			os.MkdirAll(path, zf.Mode())

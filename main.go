@@ -15,7 +15,11 @@ func main() {
 	logFile := flag.String("log-file", "/var/log/release.log", "A default log file")
 	flag.Parse()
 
-	Config = config.New(port, logFile, dataDir)
+	Config = config.Config{
+		Port:    *port,
+		LogFile: *logFile,
+		DataDir: *dataDir,
+	}
 
 	router := NewRouter()
 	log.Fatal(http.ListenAndServe(Config.Port, router))
