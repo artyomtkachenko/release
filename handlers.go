@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/artyomtkachenko/release/meta"
+	"github.com/artyomtkachenko/release/packer"
 	"github.com/artyomtkachenko/release/validate"
 	"github.com/gorilla/mux"
 	"io"
@@ -41,7 +42,7 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		ThrowError(w, 422, err.Error())
 	}
 	//TODO KILLME
-	fmt.Printf("%+v\n", Conf)
+	fmt.Printf("%+v\n", Config)
 	fmt.Printf("%+v\n", releaseMeta)
 	//Validates input
 	if err := validate.Input(releaseMeta); err != nil {
@@ -50,14 +51,14 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	}
 
 	//Creates temorary build directory
-	path, err := CreateTmpDir(releaseMeta)
+	path, err := packer.CreateTmpDir(releaseMeta, Config)
 	if err != nil {
 		ThrowError(w, 500, err.Error())
 		return
 	}
 
 	if releaseMeta.Package.Type == "rpm" {
-		err := ConvertJSON2RpmSpec(releaseMeta, path)
+		err := packer.ConvertJSON2RpmSpec(releaseMeta, path, Config)
 		if err != nil {
 			panic(err)
 		}

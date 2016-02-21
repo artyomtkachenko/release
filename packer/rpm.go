@@ -1,7 +1,7 @@
-//should live under package/ dir
-package main
+package packer
 
 import (
+	"github.com/artyomtkachenko/release/config"
 	"github.com/artyomtkachenko/release/meta"
 	"os"
 	"path/filepath"
@@ -37,11 +37,11 @@ Requires:
 )
 
 //Converts JSON object into RPM spec file
-func ConvertJSON2RpmSpec(rm meta.ReleaseMeta, tmp TmpDir) error {
+func ConvertJSON2RpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 
-	specDir := filepath.Join(Conf.DataDir, tmp.Path, "SPEC")
+	specDir := filepath.Join(conf.DataDir, tmp.Path, "SPEC")
 	specFile := filepath.Join(specDir, rm.Project.Name)
 	if err := os.Mkdir(specDir, 0755); err != nil {
 		return err

@@ -2,13 +2,12 @@ package main
 
 import (
 	"flag"
+	"github.com/artyomtkachenko/release/config"
 	"log"
 	"net/http"
 )
 
-var (
-	Conf Config
-)
+var Config config.Config
 
 func main() {
 	port := flag.String("port", ":8080", "A default port")
@@ -16,12 +15,8 @@ func main() {
 	logFile := flag.String("log-file", "/var/log/release.log", "A default log file")
 	flag.Parse()
 
-	Conf = Config{
-		Port:    *port,
-		LogFile: *logFile,
-		DataDir: *dataDir,
-	}
+	Config = config.New(port, logFile, dataDir)
 
 	router := NewRouter()
-	log.Fatal(http.ListenAndServe(Conf.Port, router))
+	log.Fatal(http.ListenAndServe(Config.Port, router))
 }
