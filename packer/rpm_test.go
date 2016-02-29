@@ -1,14 +1,15 @@
 package packer
 
 import (
-	"github.com/artyomtkachenko/release/config"
-	"github.com/artyomtkachenko/release/meta"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/artyomtkachenko/release/config"
+	"github.com/artyomtkachenko/release/meta"
 )
 
 func init() {
@@ -63,5 +64,5 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	//defer os.RemoveAll("/tmp/aaa")
+	/* defer os.RemoveAll("/tmp/aaa") */
 }

@@ -2,12 +2,12 @@ package packer
 
 import (
 	"fmt"
-	"github.com/artyomtkachenko/release/config"
-	"github.com/artyomtkachenko/release/meta"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
+
+	"github.com/artyomtkachenko/release/config"
+	"github.com/artyomtkachenko/release/meta"
 )
 
 const (
@@ -31,9 +31,10 @@ BuildRoot: {{ .Project.BuildRoot }}
 %defattr(-,{{ .Deploy.User }},{{ .Deploy.Group }},-)
 {{ end }}
 {{ define "T2" }}	
-{{ range .files }}
-%defattr(-,{{ .user }},{{ .group }},-)
-{{ end }}
+{{ range .Dirs }}
+%dir %attr({{ .Mode }}, go, go) {{ .Path }}{{end}}
+{{ range .Files }}
+%attr({{ .Mode }}, go, go) {{ .Path }}{{end}}
 {{ end }}
 `
 )
@@ -41,7 +42,31 @@ BuildRoot: {{ .Project.BuildRoot }}
 type attr struct {
 	user  string
 	group string
-	files *[]os.FileInfo
+	Files []file
+	Dirs  []file
+}
+
+type file struct {
+	Path string
+	Mode os.FileMode
+}
+
+var dirs []file
+var files []file
+
+func printFile(path string, info os.FileInfo, err error) error {
+	if err != nil {
+		panic(err)
+		return nil
+	}
+	meta := file{path, info.Mode()}
+
+	if info.IsDir() {
+		dirs = append(dirs, meta)
+	} else {
+		files = append(files, meta)
+	}
+	return nil
 }
 
 //Converts JSON object into RPM spec file
@@ -51,7 +76,7 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error 
 
 	specDir := filepath.Join(conf.DataDir, tmp.Path, "SPEC")
 	buildDir := filepath.Join(conf.DataDir, tmp.Path, "BUILD")
-	files, err := ioutil.ReadDir(buildDir)
+	err = filepath.Walk(buildDir, printFile)
 	if err != nil {
 		return err
 	}
@@ -65,12 +90,10 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error 
 	if err != nil {
 		return err
 	}
-	attrs := attr{rm.Deploy.User, rm.Deploy.Group, &files}
-	for _, ff := range files {
-		fmt.Printf("%+v\n", ff.Name())
-	}
-	err = t.ExecuteTemplate(f, "T1", rm)
-	return err
+	attrs := attr{rm.Deploy.User, rm.Deploy.Group, files, dirs}
+	fmt.Printf("%+v\n", attrs)
+	// err = t.ExecuteTemplate(f, "T1", rm)
+	// return err
 	err = t.ExecuteTemplate(f, "T2", attrs)
 	return err
 }
