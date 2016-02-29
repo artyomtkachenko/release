@@ -16,6 +16,12 @@ import (
 	"path/filepath"
 )
 
+func check(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 func ThrowError(w http.ResponseWriter, code int, text string) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(code)
@@ -31,19 +37,21 @@ func ThrowError(w http.ResponseWriter, code int, text string) {
 //Initialize the build.
 func DoInit(w http.ResponseWriter, req *http.Request) {
 	var releaseMeta meta.ReleaseMeta
+	vars := mux.Vars(req)
+	packageType := vars["packageType"]
+
+	if packageType != "rpm" {
+		ThrowError(w, 400, "Only rpm is supported at the moment")
+	}
+
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, req.ContentLength))
-	if err != nil {
-		panic(err)
-	}
-	if err := req.Body.Close(); err != nil {
-		panic(err)
-	}
+	check(err)
+	err = req.Body.Close()
+	check(err)
+
 	if err := json.Unmarshal(body, &releaseMeta); err != nil {
 		ThrowError(w, 422, err.Error())
 	}
-	//TODO KILLME
-	fmt.Printf("%+v\n", Config)
-	fmt.Printf("%+v\n", releaseMeta)
 	//Validates input
 	if err := validate.Input(releaseMeta); err != nil {
 		ThrowError(w, 422, err.Error())
@@ -57,7 +65,7 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if releaseMeta.Package.Type == "rpm" {
+	if packageType == "rpm" {
 		err := packer.GenerateRpmSpec(releaseMeta, Config, path)
 		if err != nil {
 			ThrowError(w, 400, err.Error())
@@ -65,9 +73,8 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(path); err != nil {
-		panic(err)
-	}
+	err = json.NewEncoder(w).Encode(path)
+	check(err)
 }
 
 //Gets ZIP stream and extracts it under the predefined location
@@ -86,7 +93,7 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 
 	for _, zf := range archive.File {
 		dst := filepath.Join(Config.DataDir, buildId, "BUILD")
-		path := filepath.Join(dst, zf.Name, ".spec")
+		path := filepath.Join(dst, zf.Name)
 
 		if zf.FileInfo().IsDir() {
 			os.MkdirAll(path, zf.Mode())

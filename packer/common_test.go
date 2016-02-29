@@ -1,6 +1,7 @@
 package packer
 
 import (
+	"encoding/json"
 	"github.com/artyomtkachenko/release/config"
 	"github.com/artyomtkachenko/release/meta"
 	"os"
@@ -13,6 +14,7 @@ func TestCreateTmpDir(t *testing.T) {
 		DataDir: "/tmp",
 	}
 
+	var testData meta.ReleaseMeta
 	m := meta.ReleaseMeta{
 		Project: meta.Project{
 			Name:        "foo",
@@ -43,5 +45,15 @@ func TestCreateTmpDir(t *testing.T) {
 	}
 
 	fullPath := filepath.Join(conf.DataDir, tmpPath.Path)
+	f, _ := os.Open(filepath.Join(fullPath, "package.json"))
+
+	if err := json.NewDecoder(f).Decode(&testData); err != nil {
+		panic(err)
+	}
+
+	if testData.Project.Name != "foo" {
+		t.Fatalf("Expected to get foo as a project name, but got: %v", testData.Project.Name)
+	}
+
 	defer os.Remove(fullPath)
 }

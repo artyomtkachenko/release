@@ -20,13 +20,13 @@ func NewRouter() *mux.Router {
 		Route{
 			Name:        "DoInit",
 			Method:      "POST",
-			Pattern:     "/v1/init/rhel",
+			Pattern:     "/release/v1/init/{packageType}",
 			HandlerFunc: DoInit,
 		},
 		Route{
 			Name:        "DoBuild",
 			Method:      "PUT",
-			Pattern:     "/v1/build/{buildId}",
+			Pattern:     "/release/v1/build/{buildId}",
 			HandlerFunc: DoBuild,
 		},
 	}
