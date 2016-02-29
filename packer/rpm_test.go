@@ -3,9 +3,29 @@ package packer
 import (
 	"github.com/artyomtkachenko/release/config"
 	"github.com/artyomtkachenko/release/meta"
+	"math/rand"
 	"os"
+	"path/filepath"
+	"strconv"
 	"testing"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
+func generateTestData(path string) {
+	testData := []string{"bin", "etc", "log", "data"}
+	for _, f := range testData {
+		fp := filepath.Join(path, "BUILD", f)
+		os.MkdirAll(fp, 0755)
+		for i := 0; i <= rand.Intn(5); i++ {
+			f, _ := os.Create(filepath.Join(fp, "test_"+strconv.Itoa(i)+".txt"))
+			f.Close()
+		}
+	}
+}
 
 func TestConvertJSON2RpmSpec(t *testing.T) {
 	conf := config.Config{
@@ -37,10 +57,11 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 	}
 
 	tmpId := TmpDir{Path: "aaa"}
+	generateTestData("/tmp/aaa")
 	err := GenerateRpmSpec(m, conf, tmpId)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
-	defer os.RemoveAll("/tmp/aaa")
+	//defer os.RemoveAll("/tmp/aaa")
 }
