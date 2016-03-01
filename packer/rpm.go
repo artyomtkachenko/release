@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"text/template"
 
 	"github.com/artyomtkachenko/release/config"
@@ -12,43 +13,39 @@ import (
 
 const (
 	rpmSpec = `
-{{ define "T1" }}	
-Name: {{ .Project.Name }}
-Version: {{ .Project.Version }}        
+Name: {{ .ReleaseMeta.Project.Name }}
+Version: {{ .ReleaseMeta.Project.Version }}        
 Release:        1%{?dist}
-Summary: {{ .Project.Description }}        
+Summary: {{ .ReleaseMeta.Project.Description }}        
 Packager: Santa Claus <sclaus@northpole.com>
 
-Group: {{ .Project.Email }}           
+Group: {{ .ReleaseMeta.Project.Email }}           
 License: Private        
-URL: {{ .Project.ScmUrl }}            
-BuildRoot: {{ .Project.BuildRoot }}
+URL: {{ .ReleaseMeta.Project.ScmUrl }}            
+BuildRoot: {{ .ReleaseMeta.Project.BuildRoot }}
 
 %description
-{{ .Project.Description }}
+{{ .ReleaseMeta.Project.Description }}
 
 %files
-%defattr(-,{{ .Deploy.User }},{{ .Deploy.Group }},-)
-{{ end }}
-{{ define "T2" }}	
+%defattr(-,{{ .ReleaseMeta.Deploy.User }},{{ .ReleaseMeta.Deploy.Group }},-)
+{{ $user := .ReleaseMeta.Deploy.User }}
+{{ $group := .ReleaseMeta.Deploy.Group }}
 {{ range .Dirs }}
-%dir %attr({{ .Mode }}, go, go) {{ .Path }}{{end}}
+%dir %attr({{ .Mode }}, {{ $user }}, {{ $group }}) {{ .Path }}{{end}}
 {{ range .Files }}
-%attr({{ .Mode }}, go, go) {{ .Path }}{{end}}
-{{ end }}
+%attr({{ .Mode }}, {{ $user }}, {{ $group }}) {{ .Path }}{{end}}
 `
 )
 
-type attr struct {
-	user  string
-	group string
-	Files []file
-	Dirs  []file
+type tmpl struct {
+	ReleaseMeta meta.ReleaseMeta
+	Files       []file
+	Dirs        []file
 }
-
 type file struct {
 	Path string
-	Mode os.FileMode
+	Mode string
 }
 
 var dirs []file
@@ -59,7 +56,9 @@ func printFile(path string, info os.FileInfo, err error) error {
 		panic(err)
 		return nil
 	}
-	meta := file{path, int(info.Mode())}
+	//This conversion is so hacky
+	octal := strconv.FormatInt(int64(info.Mode()), 8)
+	meta := file{path, "0" + octal[len(octal)-3:len(octal)]}
 
 	if info.IsDir() {
 		dirs = append(dirs, meta)
@@ -90,10 +89,12 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error 
 	if err != nil {
 		return err
 	}
-	attrs := attr{rm.Deploy.User, rm.Deploy.Group, files, dirs}
-	fmt.Printf("%+v\n", attrs)
-	// err = t.ExecuteTemplate(f, "T1", rm)
-	// return err
-	err = t.ExecuteTemplate(f, "T2", attrs)
-	return err
+	templateData := tmpl{rm, files, dirs}
+	fmt.Printf("%+v\n", templateData)
+
+	err = t.Execute(f, templateData)
+	if err != nil {
+		return err
+	}
+	return nil
 }
