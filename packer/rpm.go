@@ -59,7 +59,7 @@ func printFile(path string, info os.FileInfo, err error) error {
 		panic(err)
 		return nil
 	}
-	meta := file{path, info.Mode()}
+	meta := file{path, int(info.Mode())}
 
 	if info.IsDir() {
 		dirs = append(dirs, meta)
