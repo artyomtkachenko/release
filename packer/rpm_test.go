@@ -64,5 +64,5 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	//defer os.RemoveAll("/tmp/aaa")
+	defer os.RemoveAll("/tmp/aaa")
 }

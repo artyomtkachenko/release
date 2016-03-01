@@ -13,19 +13,67 @@ import (
 
 const (
 	rpmSpec = `
+# Disable the stupid stuff rpm distros include in the build process by default:
+#   Disable any prep shell actions. replace them with simply 'true'
+%define __spec_prep_post true
+%define __spec_prep_pre true
+#   Disable any build shell actions. replace them with simply 'true'
+%define __spec_build_post true
+%define __spec_build_pre true
+#   Disable any install shell actions. replace them with simply 'true'
+%define __spec_install_post true
+%define __spec_install_pre true
+#   Disable any clean shell actions. replace them with simply 'true'
+%define __spec_clean_post true
+%define __spec_clean_pre true
+# Disable checking for unpackaged files ?
+#%undefine __check_files
+
+# Use md5 file digest method
+%define _binary_filedigest_algorithm 1
+
+# Use gzip payload compression
+%define _binary_payload w9.gzdio 
+
 Name: {{ .ReleaseMeta.Project.Name }}
 Version: {{ .ReleaseMeta.Project.Version }}        
-Release:        1%{?dist}
+Release:        1
 Summary: {{ .ReleaseMeta.Project.Description }}        
-Packager: Santa Claus <sclaus@northpole.com>
+AutoReqProv: no
+#BuildRoot: {{ .ReleaseMeta.Project.BuildRoot }}
+# Seems specifying BuildRoot is required on older rpmbuild (like on CentOS 5)
+# fpm passes '--define buildroot ...' on the commandline, so just reuse that.
+BuildRoot: %buildroot
+# Add prefix, must not end with /
+Prefix: {{ .ReleaseMeta.Deploy.RootDir }}
 
-Group: {{ .ReleaseMeta.Project.Email }}           
+Group: default
 License: Private        
+Vendor: 
 URL: {{ .ReleaseMeta.Project.ScmUrl }}            
-BuildRoot: {{ .ReleaseMeta.Project.BuildRoot }}
+Packager: {{ .ReleaseMeta.Project.Email }}
 
 %description
 {{ .ReleaseMeta.Project.Description }}
+
+%prep
+# noop
+
+%build
+# noop
+
+%install
+# noop
+
+%clean
+# noop
+
+%post
+#!/bin/sh 
+after-install.sh
+
+%preun
+#!/bin/sh -> before_remove.sh
 
 %files
 %defattr(-,{{ .ReleaseMeta.Deploy.User }},{{ .ReleaseMeta.Deploy.Group }},-)
@@ -35,6 +83,8 @@ BuildRoot: {{ .ReleaseMeta.Project.BuildRoot }}
 %dir %attr({{ .Mode }}, {{ $user }}, {{ $group }}) {{ .Path }}{{end}}
 {{ range .Files }}
 %attr({{ .Mode }}, {{ $user }}, {{ $group }}) {{ .Path }}{{end}}
+
+%changelog
 `
 )
 
