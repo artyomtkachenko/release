@@ -2,6 +2,7 @@ package packer
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -92,6 +93,7 @@ type tmpl struct {
 	ReleaseMeta meta.ReleaseMeta
 	Files       []file
 	Dirs        []file
+	Scripts     map[string]string
 }
 type file struct {
 	Path string
@@ -101,7 +103,7 @@ type file struct {
 var dirs []file
 var files []file
 
-func printFile(path string, info os.FileInfo, err error) error {
+func walkBuildDir(path string, info os.FileInfo, err error) error {
 	if err != nil {
 		panic(err)
 		return nil
@@ -118,6 +120,39 @@ func printFile(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
+func getScripts(path string) (map[string]string, error) {
+	fileInfo, err := os.Stat(path)
+	var result map[string]string
+	if err != nil {
+		return result, err
+	}
+	if fileInfo.IsDir() {
+		scripts, err := filepath.Glob(filepath.Join(path, "*.sh"))
+		if err != nil {
+			return result, err
+		}
+		for _, s := range scripts {
+			script := filepath.Join(path, s)
+			fi, err := os.Stat(script)
+			if err != nil {
+				return result, err
+			}
+			if !fi.IsDir() {
+				fh, err := os.Open(script)
+				if err != nil {
+					return result, err
+				}
+				content, err := ioutil.ReadAll(fh)
+				if err != nil {
+					return result, err
+				}
+				result[s] = string(content)
+			}
+		}
+	}
+	return result, nil
+}
+
 //Converts JSON object into RPM spec file
 func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error {
 	t := template.New("RPM SPEC template")
@@ -125,8 +160,15 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error 
 
 	specDir := filepath.Join(conf.DataDir, tmp.Path, "SPEC")
 	buildDir := filepath.Join(conf.DataDir, tmp.Path, "BUILD")
-	err = filepath.Walk(buildDir, printFile)
+	scriptsdDir := filepath.Join(buildDir, "__SCRIPTS__")
+	/* configsdDir := filepath.Join(buildDir, "__CONFIGS__") */
+
+	scripts, err := getScripts(scriptsdDir)
 	if err != nil {
+		return err
+	}
+
+	if err := filepath.Walk(buildDir, walkBuildDir); err != nil {
 		return err
 	}
 	specFile := filepath.Join(specDir, rm.Project.Name+".spec")
@@ -139,7 +181,7 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error 
 	if err != nil {
 		return err
 	}
-	templateData := tmpl{rm, files, dirs}
+	templateData := tmpl{rm, files, dirs, scripts}
 	fmt.Printf("%+v\n", templateData)
 
 	err = t.Execute(f, templateData)
