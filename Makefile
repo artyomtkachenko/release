@@ -21,9 +21,7 @@ vet: fmt
 		go tool vet ${VETARGS} src/release/
 
 test: vet
-
-		go test -v release/
-		go test -v .
+		go test -v release/...
 
 cover: test
 		go test -coverprofile=cover.out  release/
