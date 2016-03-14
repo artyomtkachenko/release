@@ -2,9 +2,9 @@ package validate
 
 import (
 	"errors"
-	"github.com/artyomtkachenko/release/meta"
 	"reflect"
 	"regexp"
+	"release/meta"
 )
 
 type pattern struct {

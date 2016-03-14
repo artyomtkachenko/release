@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
-	"github.com/artyomtkachenko/release/config"
 	"log"
 	"net/http"
+	"release/config"
 )
 
 var Config config.Config

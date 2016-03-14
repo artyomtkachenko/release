@@ -2,10 +2,10 @@ package packer
 
 import (
 	"encoding/json"
-	"github.com/artyomtkachenko/release/config"
-	"github.com/artyomtkachenko/release/meta"
 	"os"
 	"path/filepath"
+	"release/config"
+	"release/meta"
 	"testing"
 )
 

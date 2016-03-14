@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/artyomtkachenko/release/config"
-	"github.com/artyomtkachenko/release/meta"
+	"release/config"
+	"release/meta"
 )
 
 func init() {

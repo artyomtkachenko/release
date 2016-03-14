@@ -4,16 +4,16 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"github.com/artyomtkachenko/release/meta"
-	"github.com/artyomtkachenko/release/packer"
-	"github.com/artyomtkachenko/release/validate"
-	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+	"release/meta"
+	"release/packer"
+	"release/validate"
+
+	"github.com/gorilla/mux"
 )
 
 func check(err error) {

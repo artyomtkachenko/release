@@ -3,11 +3,11 @@ package packer
 import (
 	"encoding/json"
 	"errors"
-	"github.com/artyomtkachenko/release/config"
-	"github.com/artyomtkachenko/release/meta"
 	"math/rand"
 	"os"
 	"path/filepath"
+	"release/config"
+	"release/meta"
 	"strconv"
 	"time"
 )

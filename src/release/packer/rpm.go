@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"text/template"
 
-	"github.com/artyomtkachenko/release/config"
-	"github.com/artyomtkachenko/release/meta"
+	"release/config"
+	"release/meta"
 )
 
 const (
