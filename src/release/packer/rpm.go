@@ -158,7 +158,6 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error 
 	specDir := filepath.Join(conf.DataDir, tmp.Path, "SPEC")
 	buildDir := filepath.Join(conf.DataDir, tmp.Path, "BUILD")
 	scriptsdDir := filepath.Join(buildDir, "__SCRIPTS__")
-	/* configsdDir := filepath.Join(buildDir, "__CONFIGS__") */
 
 	scripts, err := getScripts(scriptsdDir)
 

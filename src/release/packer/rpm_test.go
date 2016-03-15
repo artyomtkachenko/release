@@ -59,7 +59,7 @@ rm -f /usr/local/bin/$APP_NAME`
 
 func TestConvertJSON2RpmSpec(t *testing.T) {
 	conf := config.Config{
-		DataDir: "/tmp",
+		DataDir: "testdata",
 	}
 
 	m := meta.ReleaseMeta{
@@ -87,11 +87,11 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 	}
 
 	tmpId := TmpDir{Path: "aaa"}
-	generateTestData("/tmp/aaa")
+	generateTestData(filepath.Join("testdata", "aaa"))
 	err := GenerateRpmSpec(m, conf, tmpId)
 	if err != nil {
 		t.Fatalf("err: %v", err)
 	}
 
-	defer os.RemoveAll("/tmp/aaa")
+	defer os.RemoveAll("testdata/aaa")
 }

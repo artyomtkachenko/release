@@ -33,7 +33,7 @@ bench: test
 		open cpu_stats.pdf
 
 build: test
-		go build -ldflags "-X main.version=${VERSION}" -o bin/release src/release/main.go
+		go build -ldflags "-X main.version=${VERSION}" -o bin/release src/release/*.go
 		rm -rf tmp
 
 .PHONY: all deps vet test cover bench build fmt
