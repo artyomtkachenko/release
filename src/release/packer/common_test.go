@@ -44,7 +44,7 @@ func TestCreateTmpDir(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	fullPath := filepath.Join(conf.DataDir, tmpPath.Path)
+	fullPath := filepath.Join(conf.DataDir, tmpPath)
 	f, _ := os.Open(filepath.Join(fullPath, "package.json"))
 
 	if err := json.NewDecoder(f).Decode(&testData); err != nil {

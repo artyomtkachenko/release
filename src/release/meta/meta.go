@@ -1,5 +1,12 @@
 package meta
 
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"release/config"
+)
+
 type Deploy struct {
 	User    string `json:"user" yaml:"user"`
 	Group   string `json:"group" yaml:"group"`
@@ -36,4 +43,18 @@ type ReleaseMeta struct {
 	Package `json:"package" yaml:"package"`
 	Publish `json:"publish" yaml:"publish"`
 	Scripts `json:"scripts" yaml:"scripts"`
+}
+
+//Saves metadata as a json file
+func SaveMeta(rm ReleaseMeta, conf config.Config, tmpPath string) error {
+	metaTarget := filepath.Join(conf.DataDir, tmpPath, "release.json")
+	f, err := os.Create(metaTarget)
+	defer f.Close()
+	if err != nil {
+		return err
+	}
+	if err := json.NewEncoder(f).Encode(rm); err != nil {
+		return err
+	}
+	return nil
 }

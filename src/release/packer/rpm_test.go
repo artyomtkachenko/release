@@ -86,7 +86,7 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 		},
 	}
 
-	tmpId := TmpDir{Path: "aaa"}
+	tmpId := "aaa"
 	generateTestData(filepath.Join("testdata", "aaa"))
 	err := GenerateRpmSpec(m, conf, tmpId)
 	if err != nil {

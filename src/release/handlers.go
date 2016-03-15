@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -66,14 +67,14 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if packageType == "rpm" {
-		err := packer.GenerateRpmSpec(releaseMeta, Config, path)
+		err := meta.SaveMeta(releaseMeta, Config, path)
 		if err != nil {
 			ThrowError(w, 400, err.Error())
 		}
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(path)
+	fmt.Fprintf(w, "%s", path)
 	check(err)
 }
 

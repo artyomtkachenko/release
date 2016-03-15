@@ -150,13 +150,12 @@ func getScripts(path string) (map[string]string, error) {
 	return result, nil
 }
 
-//Converts JSON object into RPM spec file
-func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error {
+func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmpPath string) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 
-	specDir := filepath.Join(conf.DataDir, tmp.Path, "SPEC")
-	buildDir := filepath.Join(conf.DataDir, tmp.Path, "BUILD")
+	specDir := filepath.Join(conf.DataDir, tmpPath, "SPEC")
+	buildDir := filepath.Join(conf.DataDir, tmpPath, "BUILD")
 	scriptsdDir := filepath.Join(buildDir, "__SCRIPTS__")
 
 	scripts, err := getScripts(scriptsdDir)
