@@ -26,7 +26,7 @@ func CreateTmpDir(rm meta.ReleaseMeta, conf config.Config) (string, error) {
 		return "", errors.New(err.Error())
 	}
 
-	f, err := os.Create(filepath.Join(fullPath, "package.json"))
+	f, err := os.Create(filepath.Join(fullPath, "release.json"))
 	if err != nil {
 		panic(err)
 	}

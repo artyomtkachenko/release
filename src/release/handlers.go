@@ -66,12 +66,6 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if packageType == "rpm" {
-		err := meta.SaveMeta(releaseMeta, Config, uniqBuildId)
-		if err != nil {
-			ThrowError(w, 400, err.Error())
-		}
-	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprintf(w, "%s", uniqBuildId)
@@ -80,8 +74,26 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 
 //Gets ZIP stream and extracts it under the predefined location
 func DoBuild(w http.ResponseWriter, req *http.Request) {
+	var releaseMeta meta.ReleaseMeta
 	vars := mux.Vars(req)
 	buildId := vars["buildId"]
+	buildRoot := filepath.Join(Config.DataDir, buildId)
+	releaseConfig := filepath.Join(buildRoot, "release.json")
+	buildDir := filepath.Join(buildRoot, "BUILD")
+
+	releaseConfigBody, err := ioutil.ReadFile(releaseConfig)
+	if err != nil {
+		ThrowError(w, 400, err.Error())
+	}
+
+	if err := json.Unmarshal(releaseConfigBody, &releaseMeta); err != nil {
+		ThrowError(w, 422, err.Error())
+	}
+
+	if err := packer.GenerateRpmSpec(releaseMeta, buildRoot); err != nil {
+		ThrowError(w, 400, err.Error())
+	}
+
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		ThrowError(w, 400, err.Error())
@@ -90,12 +102,11 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	archive, err := zip.NewReader(bytes.NewReader(body), req.ContentLength)
 	if err != nil {
 		ThrowError(w, 400, err.Error())
-		defer os.RemoveAll("testdata/aaa")
 	}
 
 	for _, zf := range archive.File {
-		dst := filepath.Join(Config.DataDir, buildId, "BUILD")
-		path := filepath.Join(dst, zf.Name)
+
+		path := filepath.Join(buildDir, zf.Name)
 
 		if zf.FileInfo().IsDir() {
 			os.MkdirAll(path, zf.Mode())

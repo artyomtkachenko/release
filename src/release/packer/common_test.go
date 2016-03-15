@@ -45,7 +45,7 @@ func TestCreateTmpDir(t *testing.T) {
 	}
 
 	fullPath := filepath.Join(conf.DataDir, tmpPath)
-	f, _ := os.Open(filepath.Join(fullPath, "package.json"))
+	f, _ := os.Open(filepath.Join(fullPath, "release.json"))
 
 	if err := json.NewDecoder(f).Decode(&testData); err != nil {
 		panic(err)

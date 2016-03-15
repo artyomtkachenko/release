@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"text/template"
 
-	"release/config"
 	"release/meta"
 )
 
@@ -150,12 +149,12 @@ func getScripts(path string) (map[string]string, error) {
 	return result, nil
 }
 
-func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmpPath string) error {
+func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 
-	specDir := filepath.Join(conf.DataDir, tmpPath, "SPEC")
-	buildDir := filepath.Join(conf.DataDir, tmpPath, "BUILD")
+	specDir := filepath.Join(buildRoot, "SPEC")
+	buildDir := filepath.Join(buildRoot, "BUILD")
 	scriptsdDir := filepath.Join(buildDir, "__SCRIPTS__")
 
 	scripts, err := getScripts(scriptsdDir)
