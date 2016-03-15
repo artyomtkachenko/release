@@ -69,12 +69,9 @@ Packager: {{ .ReleaseMeta.Project.Email }}
 %clean
 # noop
 
-%post
-#!/bin/sh 
-after-install.sh
+%post{{ index .Scripts "after-install.sh" }}
 
-%preun
-#!/bin/sh -> before_remove.sh
+%preun{{ index .Scripts "before-remove.sh" }}
 
 %files
 %defattr(-,{{ .ReleaseMeta.Deploy.User }},{{ .ReleaseMeta.Deploy.Group }},-)
@@ -122,7 +119,7 @@ func walkBuildDir(path string, info os.FileInfo, err error) error {
 
 func getScripts(path string) (map[string]string, error) {
 	fileInfo, err := os.Stat(path)
-	var result map[string]string
+	var result = make(map[string]string)
 	if err != nil {
 		return result, err
 	}
@@ -131,8 +128,8 @@ func getScripts(path string) (map[string]string, error) {
 		if err != nil {
 			return result, err
 		}
-		for _, s := range scripts {
-			script := filepath.Join(path, s)
+
+		for _, script := range scripts {
 			fi, err := os.Stat(script)
 			if err != nil {
 				return result, err
@@ -146,7 +143,7 @@ func getScripts(path string) (map[string]string, error) {
 				if err != nil {
 					return result, err
 				}
-				result[s] = string(content)
+				result[filepath.Base(script)] = string(content)
 			}
 		}
 	}
@@ -164,6 +161,7 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, conf config.Config, tmp TmpDir) error 
 	/* configsdDir := filepath.Join(buildDir, "__CONFIGS__") */
 
 	scripts, err := getScripts(scriptsdDir)
+
 	if err != nil {
 		return err
 	}

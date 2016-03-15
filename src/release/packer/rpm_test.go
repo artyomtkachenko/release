@@ -1,6 +1,7 @@
 package packer
 
 import (
+	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -17,13 +18,41 @@ func init() {
 }
 
 func generateTestData(path string) {
-	testData := []string{"bin", "etc", "log", "data"}
+	testData := []string{"bin", "etc", "log", "data", "__SCRIPTS__"}
+	afterInsatll := `
+#!/bin/sh
+APP_NAME="release"
+
+chmod 0750 /usr/local/bin/$APP_NAME
+
+mkdir -p /var/log/$APP_NAME`
+	beforeRemove := `
+#!/bin/sh
+APP_NAME="release"
+
+rm -f /usr/local/bin/$APP_NAME`
+
 	for _, f := range testData {
 		fp := filepath.Join(path, "BUILD", f)
 		os.MkdirAll(fp, 0755)
-		for i := 0; i <= rand.Intn(5); i++ {
-			f, _ := os.Create(filepath.Join(fp, "test_"+strconv.Itoa(i)+".txt"))
-			f.Close()
+
+		if f == "__SCRIPTS__" {
+			scripts := []string{"before-remove.sh", "after-install.sh"}
+
+			for _, s := range scripts {
+				f, _ := os.Create(filepath.Join(fp, s))
+				if s == "after-install.sh" {
+					fmt.Fprintf(f, "%s\n", afterInsatll)
+				} else {
+					fmt.Fprintf(f, "%s\n", beforeRemove)
+				}
+				f.Close()
+			}
+		} else {
+			for i := 0; i <= rand.Intn(5); i++ {
+				f, _ := os.Create(filepath.Join(fp, "test_"+strconv.Itoa(i)+".txt"))
+				f.Close()
+			}
 		}
 	}
 }
