@@ -60,21 +60,21 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	}
 
 	//Creates temorary build directory
-	path, err := packer.CreateTmpDir(releaseMeta, Config)
+	uniqBuildId, err := packer.CreateTmpDir(releaseMeta, Config)
 	if err != nil {
 		ThrowError(w, 500, err.Error())
 		return
 	}
 
 	if packageType == "rpm" {
-		err := meta.SaveMeta(releaseMeta, Config, path)
+		err := meta.SaveMeta(releaseMeta, Config, uniqBuildId)
 		if err != nil {
 			ThrowError(w, 400, err.Error())
 		}
 	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintf(w, "%s", path)
+	fmt.Fprintf(w, "%s", uniqBuildId)
 	check(err)
 }
 
@@ -90,6 +90,7 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	archive, err := zip.NewReader(bytes.NewReader(body), req.ContentLength)
 	if err != nil {
 		ThrowError(w, 400, err.Error())
+		defer os.RemoveAll("testdata/aaa")
 	}
 
 	for _, zf := range archive.File {
