@@ -1,19 +1,31 @@
 # release
 A simple web service to build and publish rpm packages 
 
-# Should implement the following idea
+## Why?
 
+* Get rid of all Ruby dependencies like RVM, Ruby native libs and gems.
+* Do it as a web service instead of having it as a CLI utility.
+* Add more types of packages, like msi for Windows.
+* Golang is fun.
+
+## Usage example
 First call:
 
 ```shell
-curl -X POST -d '{rpm metadata} http://localhost/v1/init/rhel
-Returns: { "Id": "uniq hash" }
+curl -v -X POST -d "@without_scrips.json" localhost:8080/release/v1/init/rpm?version=1.0.1
+returns foo3117776977 
 ``` 
 
 Next call:
 
 ```shell
-curl -X POST -F "file=@/tmp/package.zip" http://localhost/v1/build/rhel/${uniq hash}
+curl -v -T apache-activemq-5.12.2-bin.zip  localhost:8080/release/v1/build/foo3117776977
+
+build, sign and publish an rpm
 ``` 
 
-build and publish an rpm
+## Todo
+* Upload to webdav and nexus
+* Revisit the DoBuild handler to make it more RAM efficient.
+* Test cover for more than 80%.
+* Add benchmarks

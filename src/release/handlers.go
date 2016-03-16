@@ -53,6 +53,7 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 	if err := json.Unmarshal(body, &releaseMeta); err != nil {
 		ThrowError(w, 422, err.Error())
 	}
+	releaseMeta.Project.Version = req.FormValue("version")
 	//Validates input
 	if err := validate.Input(releaseMeta); err != nil {
 		ThrowError(w, 422, err.Error())
