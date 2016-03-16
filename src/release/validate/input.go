@@ -21,9 +21,9 @@ func Input(rm meta.ReleaseMeta) error {
 			rm.Project.Name,
 		},
 		{
-			"BuildRoot",
-			"^\\/",
-			rm.Project.BuildRoot,
+			"ContentRoot",
+			"\\w",
+			rm.Project.ContentRoot,
 		},
 		{
 			"Email",

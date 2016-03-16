@@ -60,7 +60,7 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 	m := meta.ReleaseMeta{
 		Project: meta.Project{
 			Name:        "foo",
-			BuildRoot:   "/root",
+			ContentRoot: "/root",
 			Email:       "foo@bar.com",
 			Description: "Some text written here",
 			ScmUrl:      "https://foo.com",

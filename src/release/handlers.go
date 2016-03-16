@@ -43,7 +43,9 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 
 	if packageType != "rpm" {
 		ThrowError(w, 400, "Only rpm is supported at the moment")
+		return
 	}
+	releaseMeta.Package.Type = packageType
 
 	body, err := ioutil.ReadAll(io.LimitReader(req.Body, req.ContentLength))
 	check(err)
@@ -52,8 +54,10 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 
 	if err := json.Unmarshal(body, &releaseMeta); err != nil {
 		ThrowError(w, 422, err.Error())
+		return
 	}
 	releaseMeta.Project.Version = req.FormValue("version")
+
 	//Validates input
 	if err := validate.Input(releaseMeta); err != nil {
 		ThrowError(w, 422, err.Error())
@@ -66,7 +70,6 @@ func DoInit(w http.ResponseWriter, req *http.Request) {
 		ThrowError(w, 500, err.Error())
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprintf(w, "%s", uniqBuildId)
@@ -79,22 +82,39 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	buildId := vars["buildId"]
 	buildRoot := filepath.Join(Config.DataDir, buildId)
-	buildDir := filepath.Join(buildRoot, "BUILD")
+
+	//Reading the releas.json config file
+	releaseConfig := filepath.Join(buildRoot, "release.json")
+	releaseConfigBody, err := ioutil.ReadFile(releaseConfig)
+	if err != nil {
+		ThrowError(w, 400, err.Error())
+		return
+	}
+
+	if err := json.Unmarshal(releaseConfigBody, &releaseMeta); err != nil {
+		ThrowError(w, 422, err.Error())
+		return
+	}
+
+	buildDir, _ := packer.GenerateBuildDir(releaseMeta, buildRoot) //NO need to check for an error, as we did it in the init phase
 
 	//Verify we have a build directory first
 	if _, err := os.Stat(buildDir); err != nil {
 		ThrowError(w, 400, err.Error())
+		return
 	}
 
 	//Reading the whole ZIP package into the RAM. TODO benchmark it and check if it is possible to read it in chunks
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		ThrowError(w, 400, err.Error())
+		return
 	}
 
 	archive, err := zip.NewReader(bytes.NewReader(body), req.ContentLength)
 	if err != nil {
 		ThrowError(w, 400, err.Error())
+		return
 	}
 
 	for _, zf := range archive.File {
@@ -124,17 +144,6 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 			ThrowError(w, 400, err.Error())
 			panic(err)
 		}
-	}
-
-	//Reading the releas.json config file
-	releaseConfig := filepath.Join(buildRoot, "release.json")
-	releaseConfigBody, err := ioutil.ReadFile(releaseConfig)
-	if err != nil {
-		ThrowError(w, 400, err.Error())
-	}
-
-	if err := json.Unmarshal(releaseConfigBody, &releaseMeta); err != nil {
-		ThrowError(w, 422, err.Error())
 	}
 
 	if releaseMeta.Package.Type == "rpm" {

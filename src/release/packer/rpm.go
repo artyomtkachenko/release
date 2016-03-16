@@ -177,13 +177,13 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 
 	if rm.Scripts.BeforeRemove != "" || rm.Scripts.AfterInstall != "" {
 
-		oldScriptsdDir := filepath.Join(buildDir, "__SCRIPTS__") //TODO make it more generic, based on the metadata provided
-		newScriptsdDir := filepath.Join(buildRoot, "__SCRIPTS__")
+		oldScriptsDir := filepath.Join(buildDir, "__SCRIPTS__") //TODO make it more generic, based on the metadata provided
+		newScriptsDir := filepath.Join(buildRoot, "__SCRIPTS__")
 		if err := os.Rename(oldScriptsDir, newScriptsDir); err != nil {
 			return err
 		}
 
-		scripts, err = getScripts(newScriptsdDir)
+		scripts, err = getScripts(newScriptsDir)
 		if err != nil {
 			return err
 		}

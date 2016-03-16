@@ -11,7 +11,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "@foo",
-				BuildRoot:   "/foo",
+				ContentRoot: "/foo",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "https://foo.com",
@@ -34,7 +34,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "",
+				ContentRoot: "",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "https://foo.com",
@@ -57,7 +57,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "fooar.com",
 				Description: "Some text written here",
 				ScmUrl:      "https://foo.com",
@@ -80,7 +80,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "",
 				ScmUrl:      "https://foo.com",
@@ -103,7 +103,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "htt://foo.com",
@@ -126,7 +126,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "https://foo.com",
@@ -149,7 +149,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "https://foo.com",
@@ -172,7 +172,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "https://foo.com",
@@ -195,7 +195,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "htt://foo.com",
@@ -218,7 +218,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "htt://foo.com",
@@ -241,7 +241,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "htt://foo.com",
@@ -264,7 +264,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "htt://foo.com",
@@ -287,7 +287,7 @@ func TestInput(t *testing.T) {
 		{
 			Project: meta.Project{
 				Name:        "foo",
-				BuildRoot:   "/root",
+				ContentRoot: "/root",
 				Email:       "foo@bar.com",
 				Description: "Some text written here",
 				ScmUrl:      "htt://foo.com",
@@ -318,7 +318,7 @@ func TestInput(t *testing.T) {
 	success := meta.ReleaseMeta{
 		Project: meta.Project{
 			Name:        "foo",
-			BuildRoot:   "/root",
+			ContentRoot: "/root",
 			Email:       "foo@bar.com",
 			Description: "Some text written here",
 			ScmUrl:      "https://foo.com",
@@ -348,7 +348,7 @@ func BenchmarkInput(b *testing.B) {
 	success := meta.ReleaseMeta{
 		Project: meta.Project{
 			Name:        "foo",
-			BuildRoot:   "/root",
+			ContentRoot: "/root",
 			Email:       "foo@bar.com",
 			Description: "Some text written here",
 			ScmUrl:      "https://foo.com",

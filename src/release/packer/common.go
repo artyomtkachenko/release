@@ -16,17 +16,28 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+func GenerateBuildDir(rm meta.ReleaseMeta, buildRoot string) (string, error) {
+	if rm.Package.Type == "rpm" {
+		return filepath.Join(buildRoot, "BUILD", rm.Deploy.RootDir), nil
+	}
+	return "", errors.New("Only rpm is supported at the moment") //TODO move error  to vars
+}
+
 func CreateTmpDir(rm meta.ReleaseMeta, conf config.Config) (string, error) {
 	uniqNumber := rand.Intn(9000000000)
-	buildPath := rm.Project.Name + strconv.Itoa(uniqNumber)
-	fullPath := filepath.Join(conf.DataDir, buildPath)
-	fullBuildPath := filepath.Join(fullPath, "BUILD")
+	buildName := rm.Project.Name + strconv.Itoa(uniqNumber)
+	buildRoot := filepath.Join(conf.DataDir, buildName)
+	buildDir, err := GenerateBuildDir(rm, buildRoot)
 
-	if err := os.MkdirAll(fullBuildPath, 0755); err != nil {
+	if err != nil {
+		return "", err
+	}
+
+	if err := os.MkdirAll(buildDir, 0755); err != nil {
 		return "", errors.New(err.Error())
 	}
 
-	f, err := os.Create(filepath.Join(fullPath, "release.json"))
+	f, err := os.Create(filepath.Join(buildRoot, "release.json"))
 	if err != nil {
 		panic(err)
 	}

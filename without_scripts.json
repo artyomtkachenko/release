@@ -1,14 +1,13 @@
 {
   "project": {
-    "name": "foo",
-    "build_root": "/foo/bar",
-    "email": "fo@bar.com",
+    "name": "activemq",
+    "content_root": "/target/",
+    "email": "foo@bar.com",
     "description": "blah",
-    "version": "1.0.1",
     "url": "https://foobar.com"
   },
   "publish": {
-    "destination": "http://foobar.com",
+    "destination": "http://foobar.com/some/path",
     "type": "webdav"
   },
   "package": {
@@ -16,8 +15,8 @@
     "sign": false
   },
   "deploy": {
-    "user": "obama",
-    "group": "madhouse",
-    "root_dir": "/myapp"
+    "user": "bob",
+    "group": "bob",
+    "root_dir": "/opt/activemq"
   }
 }

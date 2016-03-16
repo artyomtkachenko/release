@@ -3,7 +3,7 @@ package meta
 type Deploy struct {
 	User    string `json:"user" yaml:"user"`
 	Group   string `json:"group" yaml:"group"`
-	RootDir string `json:"root_dir" yaml:"root_dir"`
+	RootDir string `json:"root_dir,app_root" yaml:"root_dir,app_root"`
 }
 
 type Package struct {
@@ -23,7 +23,7 @@ type Scripts struct {
 
 type Project struct {
 	Name        string `json:"name" yaml:"name"`
-	BuildRoot   string `json:"build_root" yaml:"build_root"`
+	ContentRoot string `json:"content_root" yaml:"content_root"`
 	Email       string `json:"email" yaml:"email"`
 	Description string `json:"description" yaml:"description"`
 	ScmUrl      string `json:"url" yaml:"url"`
