@@ -78,22 +78,14 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	buildId := vars["buildId"]
 	buildRoot := filepath.Join(Config.DataDir, buildId)
-	releaseConfig := filepath.Join(buildRoot, "release.json")
 	buildDir := filepath.Join(buildRoot, "BUILD")
 
-	releaseConfigBody, err := ioutil.ReadFile(releaseConfig)
-	if err != nil {
+	//Verify we have a build directory first
+	if _, err := os.Stat(buildDir); err != nil {
 		ThrowError(w, 400, err.Error())
 	}
 
-	if err := json.Unmarshal(releaseConfigBody, &releaseMeta); err != nil {
-		ThrowError(w, 422, err.Error())
-	}
-
-	if err := packer.GenerateRpmSpec(releaseMeta, buildRoot); err != nil {
-		ThrowError(w, 400, err.Error())
-	}
-
+	//Reading the whole ZIP package into the RAM. TODO benchmark it and check if it is possible to read it in chunks
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		ThrowError(w, 400, err.Error())
@@ -130,6 +122,24 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 		if _, err := io.Copy(targetFile, fileReader); err != nil {
 			ThrowError(w, 400, err.Error())
 			panic(err)
+		}
+	}
+
+	//Reading the releas.json config file
+	releaseConfig := filepath.Join(buildRoot, "release.json")
+	releaseConfigBody, err := ioutil.ReadFile(releaseConfig)
+	if err != nil {
+		ThrowError(w, 400, err.Error())
+	}
+
+	if err := json.Unmarshal(releaseConfigBody, &releaseMeta); err != nil {
+		ThrowError(w, 422, err.Error())
+	}
+
+	if releaseMeta.Package.Type == "rpm" {
+		// Now we can finally generate the RPM Spec file
+		if err := packer.GenerateRpmSpec(releaseMeta, buildRoot); err != nil {
+			ThrowError(w, 400, err.Error())
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package packer
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -91,6 +90,7 @@ type tmpl struct {
 	Dirs        []file
 	Scripts     map[string]string
 }
+
 type file struct {
 	Path string
 	Mode string
@@ -104,7 +104,7 @@ func walkBuildDir(path string, info os.FileInfo, err error) error {
 		panic(err)
 		return nil
 	}
-	//This conversion is so hacky
+	//This conversion is so hacky. Does convertion from int32 to octal
 	octal := strconv.FormatInt(int64(info.Mode()), 8)
 	meta := file{path, "0" + octal[len(octal)-3:len(octal)]}
 
@@ -155,12 +155,14 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 
 	specDir := filepath.Join(buildRoot, "SPEC")
 	buildDir := filepath.Join(buildRoot, "BUILD")
-	scriptsdDir := filepath.Join(buildDir, "__SCRIPTS__")
+	var scripts map[string]string
 
-	scripts, err := getScripts(scriptsdDir)
-
-	if err != nil {
-		return err
+	if rm.Scripts.BeforeRemove != "" || rm.Scripts.AfterInstall != "" {
+		scriptsdDir := filepath.Join(buildDir, "__SCRIPTS__")
+		scripts, err = getScripts(scriptsdDir)
+		if err != nil {
+			return err
+		}
 	}
 
 	if err := filepath.Walk(buildDir, walkBuildDir); err != nil {
@@ -176,8 +178,8 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 	if err != nil {
 		return err
 	}
+	// files and dirs are local vars to to this package
 	templateData := tmpl{rm, files, dirs, scripts}
-	fmt.Printf("%+v\n", templateData)
 
 	err = t.Execute(f, templateData)
 	if err != nil {
