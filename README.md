@@ -12,7 +12,7 @@ A simple web service to build and publish rpm packages
 First call:
 
 ```shell
-curl -v -X POST -d "@without_scrips.json" localhost:8080/release/v1/init/rpm?version=1.0.1
+curl -v -X POST -d "@without_scripts.json" localhost:8080/release/v1/init/rpm?version=1.0.1
 returns foo3117776977 
 ``` 
 

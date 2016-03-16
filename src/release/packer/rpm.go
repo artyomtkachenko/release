@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"text/template"
 
 	"release/meta"
@@ -39,7 +40,6 @@ Version: {{ .ReleaseMeta.Project.Version }}
 Release:        1
 Summary: {{ .ReleaseMeta.Project.Description }}        
 AutoReqProv: no
-#BuildRoot: {{ .ReleaseMeta.Project.BuildRoot }}
 # Seems specifying BuildRoot is required on older rpmbuild (like on CentOS 5)
 # fpm passes '--define buildroot ...' on the commandline, so just reuse that.
 BuildRoot: %buildroot
@@ -48,7 +48,7 @@ Prefix: {{ .ReleaseMeta.Deploy.RootDir }}
 
 Group: default
 License: Private        
-Vendor: 
+Vendor: {{ .Vendor }} 
 URL: {{ .ReleaseMeta.Project.ScmUrl }}            
 Packager: {{ .ReleaseMeta.Project.Email }}
 
@@ -89,6 +89,7 @@ type tmpl struct {
 	Files       []file
 	Dirs        []file
 	Scripts     map[string]string
+	Vendor      string
 }
 
 type file struct {
@@ -99,14 +100,31 @@ type file struct {
 var dirs []file
 var files []file
 
+func convertBuildDirToDepoyDir(buildRoot string, appInstallRoot string, files []file) []file {
+	var result []file
+
+	for _, f := range files {
+		a := file{
+			Path: strings.Replace(f.Path, buildRoot, appInstallRoot, -1),
+			Mode: f.Mode,
+		}
+		result = append(result, a)
+	}
+	return result
+}
+
 func walkBuildDir(path string, info os.FileInfo, err error) error {
 	if err != nil {
 		panic(err)
 		return nil
 	}
+
 	//This conversion is so hacky. Does convertion from int32 to octal
 	octal := strconv.FormatInt(int64(info.Mode()), 8)
-	meta := file{path, "0" + octal[len(octal)-3:len(octal)]}
+	meta := file{
+		path,
+		"0" + octal[len(octal)-3:len(octal)],
+	}
 
 	if info.IsDir() {
 		dirs = append(dirs, meta)
@@ -158,8 +176,14 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 	var scripts map[string]string
 
 	if rm.Scripts.BeforeRemove != "" || rm.Scripts.AfterInstall != "" {
-		scriptsdDir := filepath.Join(buildDir, "__SCRIPTS__")
-		scripts, err = getScripts(scriptsdDir)
+
+		oldScriptsdDir := filepath.Join(buildDir, "__SCRIPTS__") //TODO make it more generic, based on the metadata provided
+		newScriptsdDir := filepath.Join(buildRoot, "__SCRIPTS__")
+		if err := os.Rename(oldScriptsDir, newScriptsDir); err != nil {
+			return err
+		}
+
+		scripts, err = getScripts(newScriptsdDir)
 		if err != nil {
 			return err
 		}
@@ -179,7 +203,14 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 		return err
 	}
 	// files and dirs are local vars to to this package
-	templateData := tmpl{rm, files, dirs, scripts}
+	vendor, _ := os.Hostname()
+	templateData := tmpl{
+		rm,
+		convertBuildDirToDepoyDir(buildDir, rm.Deploy.RootDir, files),
+		convertBuildDirToDepoyDir(buildDir, rm.Deploy.RootDir, dirs),
+		scripts,
+		vendor,
+	}
 
 	err = t.Execute(f, templateData)
 	if err != nil {
