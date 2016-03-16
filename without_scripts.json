@@ -1,0 +1,23 @@
+{
+  "project": {
+    "name": "foo",
+    "build_root": "/foo/bar",
+    "email": "fo@bar.com",
+    "description": "blah",
+    "version": "1.0.1",
+    "url": "https://foobar.com"
+  },
+  "publish": {
+    "destination": "http://foobar.com",
+    "type": "webdav"
+  },
+  "package": {
+    "type": "rpm",
+    "sign": false
+  },
+  "deploy": {
+    "user": "obama",
+    "group": "madhouse",
+    "root_dir": "/myapp"
+  }
+}
