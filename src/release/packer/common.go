@@ -25,7 +25,7 @@ func GenerateBuildDir(rm meta.ReleaseMeta, buildRoot string) (string, error) {
 
 func CreateTmpDir(rm meta.ReleaseMeta, conf config.Config) (string, error) {
 	uniqNumber := rand.Intn(9000000000)
-	buildName := rm.Project.Name + strconv.Itoa(uniqNumber)
+	buildName := strconv.Itoa(uniqNumber)
 	buildRoot := filepath.Join(conf.DataDir, buildName)
 	buildDir, err := GenerateBuildDir(rm, buildRoot)
 
@@ -46,5 +46,5 @@ func CreateTmpDir(rm meta.ReleaseMeta, conf config.Config) (string, error) {
 		panic(err)
 	}
 
-	return rm.Project.Name + strconv.Itoa(uniqNumber), nil
+	return buildName, nil
 }

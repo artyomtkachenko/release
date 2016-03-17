@@ -13,13 +13,13 @@ First call:
 
 ```shell
 curl -v -X POST -d "@without_scripts.json" localhost:8080/release/v1/init/rpm?version=1.0.1
-returns foo3117776977 
+returns 3117776977 
 ``` 
 
 Next call:
 
 ```shell
-curl -v -T apache-activemq-5.12.2-bin.zip  localhost:8080/release/v1/build/foo3117776977
+curl -v -T apache-activemq-5.12.2-bin.zip  localhost:8080/release/v1/build/rpm/3117776977
 
 build, sign and publish an rpm
 ``` 
