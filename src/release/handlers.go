@@ -84,7 +84,7 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	packageType := vars["packageType"]
 	buildRoot := filepath.Join(Config.DataDir, buildId)
 
-	//Reading the releas.json config file
+	//Reading the release.json config file
 	releaseConfig := filepath.Join(buildRoot, "release.json")
 	releaseConfigBody, err := ioutil.ReadFile(releaseConfig)
 	if err != nil {
