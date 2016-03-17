@@ -151,5 +151,6 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 		if err := packer.GenerateRpmSpec(releaseMeta, buildRoot); err != nil {
 			ThrowError(w, 400, err.Error())
 		}
+		/* rpmbuild --clean  -bb --buildroot /root/data/activemq2145490656/BUILD /root/data/activemq2145490656/SPEC/activemq.spec */
 	}
 }

@@ -35,6 +35,10 @@ const (
 # Use gzip payload compression
 %define _binary_payload w9.gzdio 
 
+#Define a custom output directory
+%define _rpmdir {{ .RpmsDir }}
+%define _source_filedigest_algorithm 1
+
 Name: {{ .ReleaseMeta.Project.Name }}
 Version: {{ .ReleaseMeta.Project.Version }}        
 Release:        1
@@ -90,6 +94,7 @@ type tmpl struct {
 	Dirs        []file
 	Scripts     map[string]string
 	Vendor      string
+	RpmsDir     string
 }
 
 type file struct {
@@ -105,7 +110,7 @@ func convertBuildDirToDepoyDir(buildRoot string, appInstallRoot string, files []
 
 	for _, f := range files {
 		a := file{
-			Path: strings.Replace(f.Path, buildRoot, appInstallRoot, -1),
+			Path: strings.Replace(f.Path, buildRoot, "", -1),
 			Mode: f.Mode,
 		}
 		result = append(result, a)
@@ -172,6 +177,7 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 	t, err := t.Parse(rpmSpec)
 
 	specDir := filepath.Join(buildRoot, "SPEC")
+	rpmsDir := filepath.Join(buildRoot, "RPMS")
 	buildDir := filepath.Join(buildRoot, "BUILD")
 	var scripts map[string]string
 
@@ -193,8 +199,12 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 		return err
 	}
 	specFile := filepath.Join(specDir, rm.Project.Name+".spec")
-	if err := os.MkdirAll(specDir, 0755); err != nil {
-		return err
+
+	dirsToCreate := []string{specDir, rpmsDir}
+	for _, dir := range dirsToCreate {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
 	}
 
 	f, err := os.Create(specFile)
@@ -210,6 +220,7 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 		convertBuildDirToDepoyDir(buildDir, rm.Deploy.RootDir, dirs),
 		scripts,
 		vendor,
+		rpmsDir,
 	}
 
 	err = t.Execute(f, templateData)
