@@ -1,15 +1,17 @@
 # release
-A simple web service to build and publish rpm packages 
+A simple web service to build and publish rpm, deb and msi packages.
+Inspired by Ruby based FPM project.
 
 ## Why?
 
-* Get rid of all Ruby dependencies like RVM, Ruby native libs and gems.
+* Would like to get rid of all Ruby dependencies like RVM, Ruby native libs and gems.
 * Do it as a web service instead of having it as a CLI utility.
 * Add more types of packages, like msi for Windows.
 * Golang is fun.
+* Golang is really fun :).
 
 ## Usage example
-#Not implemented yet. Should replace the origianl bad idea with the two steps apporach.
+####Not implemented yet. Should replace the origianl bad idea with the two steps apporach.
 
 ### Building RPM
 ```bash
@@ -47,7 +49,11 @@ build, sign and publish an rpm
 ``` 
 
 ## Todo
-* Upload to webdav and nexus
+* Upload to webdav and nexus.
 * Revisit the DoBuild handler to make it more RAM efficient.
-* Test cover for more than 80%.
-* Add benchmarks
+* Better config handling
+* Tests, tests, tests.
+* Add benchmarks.
+* Add more security.
+* Add msi packaging for Windows.
+* Add deb packaging for Debian based distros.
