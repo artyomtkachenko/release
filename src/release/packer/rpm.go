@@ -1,8 +1,10 @@
 package packer
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -228,4 +230,15 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 		return err
 	}
 	return nil
+}
+
+func RunRpmBuild(rm meta.ReleaseMeta, buildRoot string) error {
+	buildDir := filepath.Join(buildRoot, "BUILD")
+	specFile := filepath.Join(buildRoot, "SPEC", rm.Project.Name+".spec")
+	cmd := "rpmbuild --clean  -bb --buildroot " + buildDir + " " + specFile
+	fmt.Printf("Running %s\n", cmd)
+	/* rpmbuild --clean  -bb --buildrootdata /activemq8811669871/BUILD/data/activemq8811669871/SPEC/activemq.spec */
+
+	_, err := exec.Command("sh", "-c", cmd).Output()
+	return err
 }

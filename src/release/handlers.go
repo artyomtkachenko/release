@@ -130,6 +130,7 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			ThrowError(w, 400, err.Error())
 			panic(err)
+			return
 		}
 		defer fileReader.Close()
 
@@ -137,12 +138,14 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			ThrowError(w, 400, err.Error())
 			panic(err)
+			return
 		}
 		defer targetFile.Close()
 
 		if _, err := io.Copy(targetFile, fileReader); err != nil {
 			ThrowError(w, 400, err.Error())
 			panic(err)
+			return
 		}
 	}
 
@@ -150,7 +153,12 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 		// Now we can finally generate the RPM Spec file
 		if err := packer.GenerateRpmSpec(releaseMeta, buildRoot); err != nil {
 			ThrowError(w, 400, err.Error())
+			return
 		}
-		/* rpmbuild --clean  -bb --buildroot /root/data/activemq2145490656/BUILD /root/data/activemq2145490656/SPEC/activemq.spec */
+		if err := packer.RunRpmBuild(releaseMeta, buildRoot); err != nil {
+			ThrowError(w, 400, err.Error())
+			return
+		}
 	}
+	/* defer os.RemoveAll(buildRoot) */
 }
