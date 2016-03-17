@@ -9,6 +9,28 @@ A simple web service to build and publish rpm packages
 * Golang is fun.
 
 ## Usage example
+#Not implemented yet. Should replace the origianl bad idea with the two steps apporach.
+
+### Building RPM
+```bash
+curl -X POST -F "data=@path/to/artefact.zip" \
+             -F "config=@without_scripts.json" \
+             -F "script=@path/to/first-script.sh" \
+             -F "script=@path/to/second-script.sh" \
+             -F 'meta={"version": "1.0.1", "revision", "de1b85fbf4f855f48c6362ea26401e46" }' \
+             localhost:9999/release/v1/build/rpm
+```
+
+### Building MSI
+```bash
+curl -X POST -F "data=@path\to\artefact.zip" \
+             -F "config=@without_scripts.json" \
+             -F 'meta={"version": "1.0.1", "revision", "de1b85fbf4f855f48c6362ea26401e46" }' \
+             localhost:9999/release/v1/build/msi
+
+```
+
+# Original, bad implementation.
 First call:
 
 ```shell
