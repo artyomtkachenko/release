@@ -4,9 +4,7 @@ package webdav
 
 import (
 	"bytes"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -18,7 +16,7 @@ func check(err error) {
 	}
 }
 
-func postFile(filename, targetUrl, username, password string) ([]byte, error) {
+func putFile(filename, targetUrl, username, password string) (string, error) {
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
@@ -39,18 +37,12 @@ func postFile(filename, targetUrl, username, password string) ([]byte, error) {
 
 	req, err := http.NewRequest("PUT", targetUrl, bodyBuf)
 	check(err)
-	req.Header.Set("Content-Type", w.FormDataContentType())
+	req.Header.Set("Content-Type", contentType)
 	req.SetBasicAuth(username, password)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	check(err)
 
-	resp_body, err := ioutil.ReadAll(resp.Body)
-	check(err)
-
-	fmt.Println(resp.Status)
-	fmt.Println(string(resp_body))
-
-	return resp_body, nil
+	return resp.Status, nil
 }
