@@ -11,7 +11,7 @@ import (
 
 func TestCreateTmpDir(t *testing.T) {
 	conf := config.Config{
-		DataDir: "/tmp",
+		DataDir: "testdata",
 	}
 
 	var testData meta.ReleaseMeta

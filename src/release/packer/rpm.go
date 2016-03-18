@@ -1,7 +1,6 @@
 package packer
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -107,6 +106,18 @@ type file struct {
 var dirs []file
 var files []file
 
+func getBuildDir(buildRoot string) string {
+	return filepath.Join(buildRoot, "BUILD")
+}
+
+func getSpecDir(buildRoot string) string {
+	return filepath.Join(buildRoot, "SPEC")
+}
+
+func getRpmsDir(buildRoot string) string {
+	return filepath.Join(buildRoot, "RPMS")
+}
+
 func convertBuildDirToDepoyDir(buildRoot string, appInstallRoot string, files []file) []file {
 	var result []file
 
@@ -178,9 +189,9 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 
-	specDir := filepath.Join(buildRoot, "SPEC")
-	rpmsDir := filepath.Join(buildRoot, "RPMS")
-	buildDir := filepath.Join(buildRoot, "BUILD")
+	specDir := getSpecDir(buildRoot)
+	rpmsDir := getRpmsDir(buildRoot)
+	buildDir := getBuildDir(buildRoot)
 	var scripts map[string]string
 
 	if rm.Scripts.BeforeRemove != "" || rm.Scripts.AfterInstall != "" {
@@ -233,11 +244,9 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
 }
 
 func RunRpmBuild(rm meta.ReleaseMeta, buildRoot string) error {
-	buildDir, _ := filepath.Abs(filepath.Join(buildRoot, "BUILD"))
-	specFile, _ := filepath.Abs(filepath.Join(buildRoot, "SPEC", rm.Project.Name+".spec"))
+	buildDir, _ := filepath.Abs(getBuildDir(buildRoot))
+	specFile, _ := filepath.Abs(filepath.Join(getSpecDir(buildRoot), rm.Project.Name+".spec"))
 	cmd := "rpmbuild --clean  -bb --buildroot " + buildDir + " " + specFile
-	fmt.Printf("Running %s\n", cmd)
-	/* rpmbuild --clean  -bb --buildroot data/activemq8811669871/BUILD/ data/activemq8811669871/SPEC/activemq.spec */
 
 	_, err := exec.Command("sh", "-c", cmd).Output()
 	return err

@@ -81,9 +81,10 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	var releaseMeta meta.ReleaseMeta
 	vars := mux.Vars(req)
 	buildId := vars["buildId"]
+	packageType := vars["packageType"]
 	buildRoot := filepath.Join(Config.DataDir, buildId)
 
-	//Reading the releas.json config file
+	//Reading the release.json config file
 	releaseConfig := filepath.Join(buildRoot, "release.json")
 	releaseConfigBody, err := ioutil.ReadFile(releaseConfig)
 	if err != nil {
@@ -96,7 +97,7 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	buildDir, _ := packer.GenerateBuildDir(releaseMeta, buildRoot) //NO need to check for an error, as we did it in the init phase
+	buildDir, _ := packer.GenerateBuildDir(releaseMeta, buildRoot)
 
 	//Verify we have a build directory first
 	if _, err := os.Stat(buildDir); err != nil {
@@ -149,7 +150,7 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	if releaseMeta.Package.Type == "rpm" {
+	if releaseMeta.Package.Type == "rpm" && packageType == "rpm" {
 		// Now we can finally generate the RPM Spec file
 		if err := packer.GenerateRpmSpec(releaseMeta, buildRoot); err != nil {
 			ThrowError(w, 400, err.Error())
