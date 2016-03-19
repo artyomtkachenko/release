@@ -3,4 +3,3 @@ src/golang.org
 pkg
 bin/
 data/
-testdata

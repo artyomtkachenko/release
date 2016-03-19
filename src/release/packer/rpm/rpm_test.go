@@ -1,4 +1,4 @@
-package packer
+package rpm
 
 import (
 	"fmt"
@@ -88,5 +88,13 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
+	defer os.RemoveAll(testDataDir)
+}
+
+func TestGenerateRpmBuildDirs(t *testing.T) {
+	testDataDir := "TestGenerateRpmBuildDirs"
+	if err := GenerateRpmBuildDirs(testDataDir); err != nil {
+		t.Errorf("Could not generate RPM build dirs. Got error %+v\n", err)
+	}
 	defer os.RemoveAll(testDataDir)
 }

@@ -1,5 +1,16 @@
 package meta
 
+import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+)
+
+type MetaData struct {
+	Version  string
+	Revision string
+}
+
 type Deploy struct {
 	User    string `json:"user" yaml:"user"`
 	Group   string `json:"group" yaml:"group"`
@@ -28,6 +39,7 @@ type Project struct {
 	Description string `json:"description" yaml:"description"`
 	ScmUrl      string `json:"url" yaml:"url"`
 	Version     string `json:"version" yaml:"version"`
+	Revision    string `json:"revision" yaml:"revision"`
 }
 
 type ReleaseMeta struct {
@@ -36,4 +48,27 @@ type ReleaseMeta struct {
 	Package `json:"package" yaml:"package"`
 	Publish `json:"publish" yaml:"publish"`
 	Scripts `json:"scripts" yaml:"scripts"`
+}
+
+func ExtractMeta(req *http.Request) (ReleaseMeta, error) {
+	var releaseMeta ReleaseMeta
+	var metaData MetaData
+	config, _, err := req.FormFile("config")
+	defer config.Close()
+	if err != nil {
+		return releaseMeta, err
+	}
+	body, err := ioutil.ReadAll(config)
+	if err := json.Unmarshal(body, &releaseMeta); err != nil {
+		return releaseMeta, err
+	}
+	meta := req.FormValue("meta")
+
+	if err := json.Unmarshal([]byte(meta), &metaData); err != nil {
+		return releaseMeta, err
+	}
+	releaseMeta.Project.Version = metaData.Version
+	releaseMeta.Project.Revision = metaData.Revision
+
+	return releaseMeta, nil
 }

@@ -1,0 +1,22 @@
+{
+  "project": {
+    "name": "activemq",
+    "content_root": "/target/",
+    "email": "foo@bar.com",
+    "description": "blah",
+    "url": "https://foobar.com"
+  },
+  "publish": {
+    "destination": "http://foobar.com/some/path",
+    "type": "webdav"
+  },
+  "package": {
+    "type": "rpm",
+    "sign": false
+  },
+  "deploy": {
+    "user": "bob",
+    "group": "bob",
+    "root_dir": "/opt/activemq"
+  }
+}

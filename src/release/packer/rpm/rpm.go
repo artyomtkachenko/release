@@ -1,4 +1,4 @@
-package packer
+package rpm
 
 import (
 	"io/ioutil"
@@ -105,6 +105,16 @@ type file struct {
 
 var dirs []file
 var files []file
+
+func GenerateRpmBuildDirs(buildRoot string) error {
+	buildDirs := []string{"BUILD", "SPEC", "RPMS", "SCRIPTS"}
+	for _, bd := range buildDirs {
+		if err := os.MkdirAll(bd, 0755); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func getBuildDir(buildRoot string) string {
 	return filepath.Join(buildRoot, "BUILD")
