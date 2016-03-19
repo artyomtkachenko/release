@@ -13,6 +13,9 @@ func ExtractScripts(req *http.Request) (map[string]string, error) {
 
 	for _, script := range scriptsTypes {
 		stream, header, err := req.FormFile(script)
+		if err == http.ErrMissingFile {
+			continue
+		}
 		if err != nil {
 			return result, err
 		}

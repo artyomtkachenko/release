@@ -34,7 +34,7 @@ bench: test
 
 build: test
 		go build -ldflags "-X main.version=${VERSION}" -o bin/release src/release/*.go
-		GOOS=linux go build -ldflags "-X main.version=${VERSION}" -o bin/release-linux src/release/*.go
+		# GOOS=linux go build -ldflags "-X main.version=${VERSION}" -o bin/release-linux src/release/*.go
 		rm -rf tmp
 
 .PHONY: all deps vet test cover bench build fmt

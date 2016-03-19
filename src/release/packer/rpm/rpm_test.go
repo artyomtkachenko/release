@@ -78,8 +78,40 @@ func TestGenerateRpmSpec(t *testing.T) {
 
 func TestGenerateRpmBuildDirs(t *testing.T) {
 	testDataDir := "TestGenerateRpmBuildDirs"
-	if err := GenerateRpmBuildDirs(testDataDir); err != nil {
+	rm := meta.ReleaseMeta{
+		Project: meta.Project{
+			Name:        "foo",
+			ContentRoot: "/root",
+			Email:       "foo@bar.com",
+			Description: "Some text written here",
+			ScmUrl:      "https://foo.com",
+			Version:     "1.0.2",
+		},
+		Publish: meta.Publish{
+			Type:        "webdav",
+			Destination: "http://foo.com",
+		},
+		Package: meta.Package{
+			Type: "rpm",
+			Sign: false,
+		},
+		Deploy: meta.Deploy{
+			User:    "bob",
+			Group:   "bob",
+			RootDir: "/root",
+		},
+	}
+
+	if err := GenerateRpmBuildDirs(testDataDir, rm); err != nil {
 		t.Errorf("Could not generate RPM build dirs. Got error %+v\n", err)
+	}
+	buildDirs := []string{"BUILD", "SPEC", "RPMS"}
+	for _, bd := range buildDirs {
+		dir := filepath.Join(testDataDir, bd)
+		_, err := os.Open(dir)
+		if err != nil {
+			t.Errorf("%+v\n", err)
+		}
 	}
 	defer os.RemoveAll(testDataDir)
 }

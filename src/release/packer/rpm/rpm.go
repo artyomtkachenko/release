@@ -71,9 +71,11 @@ Packager: {{ .ReleaseMeta.Project.Email }}
 %clean
 # noop
 
-%post{{ index .Scripts "post" }}
+%post
+{{ index .Scripts "post" }}
 
-%preun{{ index .Scripts "preun" }}
+%preun
+{{ index .Scripts "preun" }}
 
 %files
 %defattr(-,{{ .ReleaseMeta.Deploy.User }},{{ .ReleaseMeta.Deploy.Group }},-)
@@ -105,10 +107,14 @@ type file struct {
 var dirs []file
 var files []file
 
-func GenerateRpmBuildDirs(buildRoot string) error {
-	buildDirs := []string{"BUILD", "SPEC", "RPMS", "SCRIPTS"}
+func GenerateRpmBuildDirs(buildRoot string, rm meta.ReleaseMeta) error {
+	buildDirs := []string{"BUILD", "SPEC", "RPMS"}
 	for _, bd := range buildDirs {
-		if err := os.MkdirAll(bd, 0755); err != nil {
+		dir := filepath.Join(buildRoot, bd)
+		if bd == "BUILD" {
+			dir = filepath.Join(dir, rm.Deploy.RootDir)
+		}
+		if err := os.MkdirAll(dir, 0755); err != nil {
 			return err
 		}
 	}

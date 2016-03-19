@@ -21,7 +21,7 @@ func NewRouter() *mux.Router {
 		Route{
 			Name:        "DoBuild",
 			Method:      "POST",
-			Pattern:     "/release/v1/build/{packageType}/{buildId}",
+			Pattern:     "/release/v1/build/{packageType}",
 			HandlerFunc: DoBuild,
 		},
 	}
