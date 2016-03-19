@@ -4,7 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"regexp"
-	"release/meta"
+	"release/config"
 )
 
 type pattern struct {
@@ -13,7 +13,7 @@ type pattern struct {
 	content string
 }
 
-func Input(rm meta.ReleaseMeta) error {
+func Input(rm config.ReleaseConfig) error {
 	patterns := []pattern{
 		{
 			"Name",

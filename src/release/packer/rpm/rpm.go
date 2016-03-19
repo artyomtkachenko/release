@@ -1,6 +1,7 @@
 package rpm
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -8,7 +9,7 @@ import (
 	"strings"
 	"text/template"
 
-	"release/meta"
+	"release/config"
 )
 
 const (
@@ -39,25 +40,25 @@ const (
 %define _rpmdir {{ .RpmsDir }}
 %define _source_filedigest_algorithm 1
 
-Name: {{ .ReleaseMeta.Project.Name }}
-Version: {{ .ReleaseMeta.Project.Version }}        
+Name: {{ .ReleaseConfig.Project.Name }}
+Version: {{ .ReleaseConfig.Project.Version }}        
 Release:        1
-Summary: {{ .ReleaseMeta.Project.Description }}        
+Summary: {{ .ReleaseConfig.Project.Description }}        
 AutoReqProv: no
 # Seems specifying BuildRoot is required on older rpmbuild (like on CentOS 5)
 # fpm passes '--define buildroot ...' on the commandline, so just reuse that.
 BuildRoot: %buildroot
 # Add prefix, must not end with /
-Prefix: {{ .ReleaseMeta.Deploy.RootDir }}
+Prefix: {{ .ReleaseConfig.Deploy.RootDir }}
 
 Group: default
 License: Private        
 Vendor: {{ .Vendor }} 
-URL: {{ .ReleaseMeta.Project.ScmUrl }}            
-Packager: {{ .ReleaseMeta.Project.Email }}
+URL: {{ .ReleaseConfig.Project.ScmUrl }}            
+Packager: {{ .ReleaseConfig.Project.Email }}
 
 %description
-{{ .ReleaseMeta.Project.Description }}
+{{ .ReleaseConfig.Project.Description }}
 
 %prep
 # noop
@@ -78,9 +79,9 @@ Packager: {{ .ReleaseMeta.Project.Email }}
 {{ index .Scripts "preun" }}
 
 %files
-%defattr(-,{{ .ReleaseMeta.Deploy.User }},{{ .ReleaseMeta.Deploy.Group }},-)
-{{ $user := .ReleaseMeta.Deploy.User }}
-{{ $group := .ReleaseMeta.Deploy.Group }}
+%defattr(-,{{ .ReleaseConfig.Deploy.User }},{{ .ReleaseConfig.Deploy.Group }},-)
+{{ $user := .ReleaseConfig.Deploy.User }}
+{{ $group := .ReleaseConfig.Deploy.Group }}
 {{ range .Dirs }}
 %dir %attr({{ .Mode }}, {{ $user }}, {{ $group }}) {{ .Path }}{{end}}
 {{ range .Files }}
@@ -91,12 +92,12 @@ Packager: {{ .ReleaseMeta.Project.Email }}
 )
 
 type tmpl struct {
-	ReleaseMeta meta.ReleaseMeta
-	Files       []file
-	Dirs        []file
-	Scripts     map[string]string
-	Vendor      string
-	RpmsDir     string
+	ReleaseConfig config.ReleaseConfig
+	Files         []file
+	Dirs          []file
+	Scripts       map[string]string
+	Vendor        string
+	RpmsDir       string
 }
 
 type file struct {
@@ -107,12 +108,12 @@ type file struct {
 var dirs []file
 var files []file
 
-func GenerateRpmBuildDirs(buildRoot string, rm meta.ReleaseMeta) error {
+func GenerateRpmBuildDirs(buildRoot string, rc config.ReleaseConfig) error {
 	buildDirs := []string{"BUILD", "SPEC", "RPMS"}
 	for _, bd := range buildDirs {
 		dir := filepath.Join(buildRoot, bd)
 		if bd == "BUILD" {
-			dir = filepath.Join(dir, rm.Deploy.RootDir)
+			dir = filepath.Join(dir, rc.Deploy.RootDir)
 		}
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return err
@@ -167,7 +168,13 @@ func walkBuildDir(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
-func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string, scripts map[string]string) error {
+//Free all global resources
+func free() {
+	files = nil
+	dirs = nil
+}
+
+func GenerateRpmSpec(rm config.ReleaseConfig, buildRoot string, scripts map[string]string) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 
@@ -200,14 +207,25 @@ func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string, scripts map[string]s
 	if err != nil {
 		return err
 	}
+	defer free()
 	return nil
 }
 
-func RunRpmBuild(rm meta.ReleaseMeta, buildRoot string) error {
+func RunRpmBuild(rc config.ReleaseConfig, buildRoot string) error {
 	buildDir, _ := filepath.Abs(getBuildDir(buildRoot))
-	specFile, _ := filepath.Abs(filepath.Join(getSpecDir(buildRoot), rm.Project.Name+".spec"))
-	cmd := "rpmbuild --clean  -bb --buildroot " + buildDir + " " + specFile
+	specFile, _ := filepath.Abs(filepath.Join(getSpecDir(buildRoot), rc.Project.Name+".spec"))
+	sign := ""
+	if rc.Package.Sign {
+		sign = " --sign "
+	}
+	cmd := "rpmbuild --clean  -bb --target " +
+		rc.Project.Arch +
+		" --buildroot " + buildDir +
+		sign +
+		" " + specFile
 
+	fmt.Println(cmd)
 	_, err := exec.Command("sh", "-c", cmd).Output()
+
 	return err
 }

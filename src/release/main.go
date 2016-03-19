@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	Config  config.Config
+	Config  config.ServerConfig
 	version string
 )
 
@@ -27,7 +27,7 @@ func main() {
 	}
 	flag.Parse()
 
-	Config = config.Config{
+	Config = config.ServerConfig{
 		Port:    *port,
 		LogFile: *logFile,
 		DataDir: *dataDir,

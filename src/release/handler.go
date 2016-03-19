@@ -47,16 +47,19 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	req.ParseMultipartForm(0) //Do not use RAM, use tmp files to store streams
-	releaseMeta, err := extractor.ExtractMeta(req)
+	releaseConfig, err := extractor.ExtractMeta(req)
 	if err != nil {
 		ThrowError(w, 400, "extractor.ExtractMeta", err.Error())
 
 		return
 	}
-	releaseMeta.Package.Type = packageType
+	releaseConfig.Package.Type = packageType
+	if releaseConfig.Project.Arch == "" {
+		releaseConfig.Project.Arch = "noarch" // Set it by default
+	}
 
 	//Validates input
-	if err := validate.Input(releaseMeta); err != nil {
+	if err := validate.Input(releaseConfig); err != nil {
 		ThrowError(w, 422, "validate.Input", err.Error())
 		return
 	}
@@ -71,11 +74,11 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 	buildRoot := filepath.Join(Config.DataDir, uniqBuildId)
 
 	if packageType == "rpm" {
-		if err := rpm.GenerateRpmBuildDirs(buildRoot, releaseMeta); err != nil {
+		if err := rpm.GenerateRpmBuildDirs(buildRoot, releaseConfig); err != nil {
 			ThrowError(w, 400, " rpm.GenerateRpmBuildDirs", err.Error())
 			return
 		}
-		buildDir := filepath.Join(buildRoot, "BUILD", releaseMeta.Deploy.RootDir)
+		buildDir := filepath.Join(buildRoot, "BUILD", releaseConfig.Deploy.RootDir)
 
 		if err := extractor.Extract(buildDir, req); err != nil {
 			ThrowError(w, 400, "extractor.Extract", err.Error())
@@ -86,11 +89,11 @@ func DoBuild(w http.ResponseWriter, req *http.Request) {
 			ThrowError(w, 400, "extractor.ExtractScripts", err.Error())
 			return
 		}
-		if err := rpm.GenerateRpmSpec(releaseMeta, buildRoot, scripts); err != nil {
+		if err := rpm.GenerateRpmSpec(releaseConfig, buildRoot, scripts); err != nil {
 			ThrowError(w, 400, "rpm.GenerateRpmSpec", err.Error())
 			return
 		}
-		if err := rpm.RunRpmBuild(releaseMeta, buildRoot); err != nil {
+		if err := rpm.RunRpmBuild(releaseConfig, buildRoot); err != nil {
 			ThrowError(w, 400, "rpm.RunRpmBuild", err.Error())
 			return
 		}

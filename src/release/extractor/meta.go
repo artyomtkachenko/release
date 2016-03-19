@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"release/meta"
+	"release/config"
 )
 
-func ExtractMeta(req *http.Request) (meta.ReleaseMeta, error) {
-	var releaseMeta meta.ReleaseMeta
-	var metaData meta.MetaData
+func ExtractMeta(req *http.Request) (config.ReleaseConfig, error) {
+	var releaseMeta config.ReleaseConfig
+	var metaData config.MetaData
 	config, _, err := req.FormFile("config")
 	defer config.Close()
 	if err != nil {

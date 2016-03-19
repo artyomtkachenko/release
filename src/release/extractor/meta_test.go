@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"release/meta"
+	"release/config"
 	"testing"
 )
 
 func TestExtractMetaSuccess(t *testing.T) {
-	var rm meta.ReleaseMeta
+	var rm config.ReleaseConfig
 	var ret error
 	meta := `{"version": "1.0.0", "revision": "abd1767a214"}`
 

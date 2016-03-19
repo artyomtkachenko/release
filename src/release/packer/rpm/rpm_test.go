@@ -5,12 +5,11 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"release/config"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
-
-	"release/meta"
 )
 
 func init() {
@@ -33,8 +32,8 @@ func generateTestData(path string) {
 }
 
 func TestGenerateRpmSpec(t *testing.T) {
-	m := meta.ReleaseMeta{
-		Project: meta.Project{
+	m := config.ReleaseConfig{
+		Project: config.Project{
 			Name:        "foo",
 			ContentRoot: "/root",
 			Email:       "foo@bar.com",
@@ -42,15 +41,15 @@ func TestGenerateRpmSpec(t *testing.T) {
 			ScmUrl:      "https://foo.com",
 			Version:     "1.0.2",
 		},
-		Publish: meta.Publish{
+		Publish: config.Publish{
 			Type:        "webdav",
 			Destination: "http://foo.com",
 		},
-		Package: meta.Package{
+		Package: config.Package{
 			Type: "rpm",
 			Sign: false,
 		},
-		Deploy: meta.Deploy{
+		Deploy: config.Deploy{
 			User:    "bob",
 			Group:   "bob",
 			RootDir: "/root",
@@ -78,8 +77,8 @@ func TestGenerateRpmSpec(t *testing.T) {
 
 func TestGenerateRpmBuildDirs(t *testing.T) {
 	testDataDir := "TestGenerateRpmBuildDirs"
-	rm := meta.ReleaseMeta{
-		Project: meta.Project{
+	rm := config.ReleaseConfig{
+		Project: config.Project{
 			Name:        "foo",
 			ContentRoot: "/root",
 			Email:       "foo@bar.com",
@@ -87,15 +86,15 @@ func TestGenerateRpmBuildDirs(t *testing.T) {
 			ScmUrl:      "https://foo.com",
 			Version:     "1.0.2",
 		},
-		Publish: meta.Publish{
+		Publish: config.Publish{
 			Type:        "webdav",
 			Destination: "http://foo.com",
 		},
-		Package: meta.Package{
+		Package: config.Package{
 			Type: "rpm",
 			Sign: false,
 		},
-		Deploy: meta.Deploy{
+		Deploy: config.Deploy{
 			User:    "bob",
 			Group:   "bob",
 			RootDir: "/root",

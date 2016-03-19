@@ -3,13 +3,13 @@ package validate
 import (
 	"testing"
 
-	"release/meta"
+	"release/config"
 )
 
 func TestInput(t *testing.T) {
-	shouldFail := []meta.ReleaseMeta{
+	shouldFail := []config.ReleaseConfig{
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "@foo",
 				ContentRoot: "/foo",
 				Email:       "foo@bar.com",
@@ -17,22 +17,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "https://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "",
 				Email:       "foo@bar.com",
@@ -40,22 +40,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "https://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "fooar.com",
@@ -63,22 +63,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "https://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -86,22 +86,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "https://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -109,22 +109,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "htt://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -132,22 +132,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "https://foo.com",
 				Version:     "",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -155,22 +155,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "https://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "foo",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -178,22 +178,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "https://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -201,22 +201,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "htt://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "npm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -224,22 +224,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "htt://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: true,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -247,22 +247,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "htt://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob@",
 				Group:   "bob",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -270,22 +270,22 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "htt://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob@",
 				RootDir: "/myapp/foo",
 			},
 		},
 		{
-			Project: meta.Project{
+			Project: config.Project{
 				Name:        "foo",
 				ContentRoot: "/root",
 				Email:       "foo@bar.com",
@@ -293,15 +293,15 @@ func TestInput(t *testing.T) {
 				ScmUrl:      "htt://foo.com",
 				Version:     "1.0.2",
 			},
-			Publish: meta.Publish{
+			Publish: config.Publish{
 				Type:        "webdav",
 				Destination: "http://foo.com",
 			},
-			Package: meta.Package{
+			Package: config.Package{
 				Type: "rpm",
 				Sign: false,
 			},
-			Deploy: meta.Deploy{
+			Deploy: config.Deploy{
 				User:    "bob",
 				Group:   "bob",
 				RootDir: "",
@@ -315,8 +315,8 @@ func TestInput(t *testing.T) {
 			t.Fatalf("err: %v", err)
 		}
 	}
-	success := meta.ReleaseMeta{
-		Project: meta.Project{
+	success := config.ReleaseConfig{
+		Project: config.Project{
 			Name:        "foo",
 			ContentRoot: "/root",
 			Email:       "foo@bar.com",
@@ -324,15 +324,15 @@ func TestInput(t *testing.T) {
 			ScmUrl:      "https://foo.com",
 			Version:     "1.0.2",
 		},
-		Publish: meta.Publish{
+		Publish: config.Publish{
 			Type:        "webdav",
 			Destination: "http://foo.com",
 		},
-		Package: meta.Package{
+		Package: config.Package{
 			Type: "rpm",
 			Sign: false,
 		},
-		Deploy: meta.Deploy{
+		Deploy: config.Deploy{
 			User:    "bob",
 			Group:   "bob",
 			RootDir: "/root",
@@ -345,8 +345,8 @@ func TestInput(t *testing.T) {
 
 }
 func BenchmarkInput(b *testing.B) {
-	success := meta.ReleaseMeta{
-		Project: meta.Project{
+	success := config.ReleaseConfig{
+		Project: config.Project{
 			Name:        "foo",
 			ContentRoot: "/root",
 			Email:       "foo@bar.com",
@@ -354,15 +354,15 @@ func BenchmarkInput(b *testing.B) {
 			ScmUrl:      "https://foo.com",
 			Version:     "1.0.2",
 		},
-		Publish: meta.Publish{
+		Publish: config.Publish{
 			Type:        "webdav",
 			Destination: "http://foo.com",
 		},
-		Package: meta.Package{
+		Package: config.Package{
 			Type: "rpm",
 			Sign: false,
 		},
-		Deploy: meta.Deploy{
+		Deploy: config.Deploy{
 			User:    "bob",
 			Group:   "bob",
 			RootDir: "/root",
