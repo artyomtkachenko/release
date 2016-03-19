@@ -19,14 +19,8 @@ func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	routes := Routes{
 		Route{
-			Name:        "DoInit",
-			Method:      "POST",
-			Pattern:     "/release/v1/init/{packageType}",
-			HandlerFunc: DoInit,
-		},
-		Route{
 			Name:        "DoBuild",
-			Method:      "PUT",
+			Method:      "POST",
 			Pattern:     "/release/v1/build/{packageType}/{buildId}",
 			HandlerFunc: DoBuild,
 		},

@@ -1,4 +1,4 @@
-package meta
+package extractor
 
 import (
 	"bytes"
@@ -7,11 +7,12 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"release/meta"
 	"testing"
 )
 
 func TestExtractMetaSuccess(t *testing.T) {
-	var rm ReleaseMeta
+	var rm meta.ReleaseMeta
 	var ret error
 	meta := `{"version": "1.0.0", "revision": "abd1767a214"}`
 

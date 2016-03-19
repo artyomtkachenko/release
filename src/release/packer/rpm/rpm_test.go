@@ -1,11 +1,12 @@
 package rpm
 
 import (
-	"fmt"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -17,46 +18,21 @@ func init() {
 }
 
 func generateTestData(path string) {
-	testData := []string{"bin", "etc", "log", "data", "__SCRIPTS__"}
-	afterInsatll := `
-#!/bin/sh
-APP_NAME="release"
+	testData := []string{"bin", "etc", "log", "data"}
 
-chmod 0750 /usr/local/bin/$APP_NAME
-
-mkdir -p /var/log/$APP_NAME`
-	beforeRemove := `
-#!/bin/sh
-APP_NAME="release"
-
-rm -f /usr/local/bin/$APP_NAME`
-
+	os.MkdirAll(filepath.Join(path, "SPEC"), 0755)
 	for _, f := range testData {
 		fp := filepath.Join(path, "BUILD", f)
 		os.MkdirAll(fp, 0755)
 
-		if f == "__SCRIPTS__" {
-			scripts := []string{"before-remove.sh", "after-install.sh"}
-
-			for _, s := range scripts {
-				f, _ := os.Create(filepath.Join(fp, s))
-				if s == "after-install.sh" {
-					fmt.Fprintf(f, "%s\n", afterInsatll)
-				} else {
-					fmt.Fprintf(f, "%s\n", beforeRemove)
-				}
-				f.Close()
-			}
-		} else {
-			for i := 0; i <= rand.Intn(5); i++ {
-				f, _ := os.Create(filepath.Join(fp, "test_"+strconv.Itoa(i)+".txt"))
-				f.Close()
-			}
+		for i := 0; i <= rand.Intn(5); i++ {
+			f, _ := os.Create(filepath.Join(fp, "test_"+strconv.Itoa(i)+".txt"))
+			f.Close()
 		}
 	}
 }
 
-func TestConvertJSON2RpmSpec(t *testing.T) {
+func TestGenerateRpmSpec(t *testing.T) {
 	m := meta.ReleaseMeta{
 		Project: meta.Project{
 			Name:        "foo",
@@ -81,11 +57,20 @@ func TestConvertJSON2RpmSpec(t *testing.T) {
 		},
 	}
 
-	testDataDir := filepath.Join("testdata", "aaa")
+	testDataDir := filepath.Join("TestGenerateRpmSpec")
 	generateTestData(testDataDir)
-	err := GenerateRpmSpec(m, testDataDir)
+	scripts := map[string]string{
+		"post":  "#!/bin/sh\necho postInstall",
+		"preun": "#!/bin/sh\necho 40054dea1ba2f1f425ef792e6cee80b4",
+	}
+	err := GenerateRpmSpec(m, testDataDir, scripts)
 	if err != nil {
 		t.Fatalf("err: %v", err)
+	}
+
+	spec, _ := ioutil.ReadFile(filepath.Join(testDataDir, "SPEC", "foo.spec"))
+	if !strings.Contains(string(spec), "40054dea1ba2f1f425ef792e6cee80b4") {
+		t.Errorf("Did not found the key string 40054dea1ba2f1f425ef792e6cee80b4 in the spec file")
 	}
 
 	defer os.RemoveAll(testDataDir)
@@ -98,3 +83,7 @@ func TestGenerateRpmBuildDirs(t *testing.T) {
 	}
 	defer os.RemoveAll(testDataDir)
 }
+
+// func Test_convertBuildDirToDepoyDir(r *testing.T) {
+// 	result := convertBuildDirToDepoyDir("Test_convertBuildDirToDepoyDir", "/opt/myapp", files)
+// }

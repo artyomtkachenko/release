@@ -1,7 +1,6 @@
 package rpm
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -72,9 +71,9 @@ Packager: {{ .ReleaseMeta.Project.Email }}
 %clean
 # noop
 
-%post{{ index .Scripts "after-install.sh" }}
+%post{{ index .Scripts "post" }}
 
-%preun{{ index .Scripts "before-remove.sh" }}
+%preun{{ index .Scripts "preun" }}
 
 %files
 %defattr(-,{{ .ReleaseMeta.Deploy.User }},{{ .ReleaseMeta.Deploy.Group }},-)
@@ -162,73 +161,18 @@ func walkBuildDir(path string, info os.FileInfo, err error) error {
 	return nil
 }
 
-func getScripts(path string) (map[string]string, error) {
-	fileInfo, err := os.Stat(path)
-	var result = make(map[string]string)
-	if err != nil {
-		return result, err
-	}
-	if fileInfo.IsDir() {
-		scripts, err := filepath.Glob(filepath.Join(path, "*.sh"))
-		if err != nil {
-			return result, err
-		}
-
-		for _, script := range scripts {
-			fi, err := os.Stat(script)
-			if err != nil {
-				return result, err
-			}
-			if !fi.IsDir() {
-				fh, err := os.Open(script)
-				if err != nil {
-					return result, err
-				}
-				content, err := ioutil.ReadAll(fh)
-				if err != nil {
-					return result, err
-				}
-				result[filepath.Base(script)] = string(content)
-			}
-		}
-	}
-	return result, nil
-}
-
-func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string) error {
+func GenerateRpmSpec(rm meta.ReleaseMeta, buildRoot string, scripts map[string]string) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
 
 	specDir := getSpecDir(buildRoot)
 	rpmsDir := getRpmsDir(buildRoot)
 	buildDir := getBuildDir(buildRoot)
-	var scripts map[string]string
-
-	if rm.Scripts.BeforeRemove != "" || rm.Scripts.AfterInstall != "" {
-
-		oldScriptsDir := filepath.Join(buildDir, "__SCRIPTS__") //TODO make it more generic, based on the metadata provided
-		newScriptsDir := filepath.Join(buildRoot, "__SCRIPTS__")
-		if err := os.Rename(oldScriptsDir, newScriptsDir); err != nil {
-			return err
-		}
-
-		scripts, err = getScripts(newScriptsDir)
-		if err != nil {
-			return err
-		}
-	}
 
 	if err := filepath.Walk(buildDir, walkBuildDir); err != nil {
 		return err
 	}
 	specFile := filepath.Join(specDir, rm.Project.Name+".spec")
-
-	dirsToCreate := []string{specDir, rpmsDir}
-	for _, dir := range dirsToCreate {
-		if err := os.MkdirAll(dir, 0755); err != nil {
-			return err
-		}
-	}
 
 	f, err := os.Create(specFile)
 	defer f.Close()

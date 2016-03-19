@@ -7,18 +7,17 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"path/filepath"
+	"strings"
 	"testing"
 )
 
 func TestExtractScriptsSucess(t *testing.T) {
 	var ret error
+	var scripts map[string]string
 	filename := "testdata/simple.sh"
-	testData := "TestExtractScriptsSucess"
-	os.MkdirAll(filepath.Join(testData, "SCRIPTS"), 0755)
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ret = ExtractScripts("TestExtractScriptsSucess", r)
+		scripts, ret = ExtractScripts(r)
 	}))
 	defer ts.Close()
 
@@ -31,7 +30,6 @@ func TestExtractScriptsSucess(t *testing.T) {
 	io.Copy(fileWriter, fh)
 
 	contentType := bodyWriter.FormDataContentType()
-	/* fmt.Printf("%+v\n", bodyBuf) */
 	bodyWriter.Close()
 
 	req, _ := http.NewRequest("POST", ts.URL, bodyBuf)
@@ -39,14 +37,8 @@ func TestExtractScriptsSucess(t *testing.T) {
 
 	client := &http.Client{}
 	client.Do(req)
-	testFiles := []string{
-		filepath.Join(testData, "SCRIPTS", "post.sh"),
-	}
 
-	for _, file := range testFiles {
-		if _, err := os.Open(file); err != nil {
-			t.Errorf("Expected file %s to exist\n", file)
-		}
+	if !strings.Contains(scripts["post"], "#!/bin/sh") {
+		t.Errorf("Expected to get #!/bin/sh, got %+v", scripts)
 	}
-	defer os.RemoveAll(testData)
 }
