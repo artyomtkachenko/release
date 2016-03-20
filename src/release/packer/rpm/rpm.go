@@ -1,7 +1,6 @@
 package rpm
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -105,9 +104,6 @@ type file struct {
 	Mode string
 }
 
-var dirs []file
-var files []file
-
 func GenerateRpmBuildDirs(buildRoot string, rc config.ReleaseConfig) error {
 	buildDirs := []string{"BUILD", "SPEC", "RPMS"}
 	for _, bd := range buildDirs {
@@ -134,7 +130,7 @@ func getRpmsDir(buildRoot string) string {
 	return filepath.Join(buildRoot, "RPMS")
 }
 
-func convertBuildDirToDepoyDir(buildRoot string, appInstallRoot string, files []file) []file {
+func convertBuildDirToDepoyDir(buildRoot, appInstallRoot string, files []file) []file {
 	var result []file
 
 	for _, f := range files {
@@ -147,42 +143,38 @@ func convertBuildDirToDepoyDir(buildRoot string, appInstallRoot string, files []
 	return result
 }
 
-func walkBuildDir(path string, info os.FileInfo, err error) error {
-	if err != nil {
-		panic(err)
-		return nil
-	}
-
-	//This conversion is so hacky. Does convertion from int32 to octal
-	octal := strconv.FormatInt(int64(info.Mode()), 8)
-	meta := file{
-		path,
-		"0" + octal[len(octal)-3:len(octal)],
-	}
-
-	if info.IsDir() {
-		dirs = append(dirs, meta)
-	} else {
-		files = append(files, meta)
-	}
-	return nil
-}
-
-//Free all global resources
-func free() {
-	files = nil
-	dirs = nil
-}
-
 func GenerateRpmSpec(rm config.ReleaseConfig, buildRoot string, scripts map[string]string) error {
 	t := template.New("RPM SPEC template")
 	t, err := t.Parse(rpmSpec)
+	var dirs []file
+	var files []file
 
 	specDir := getSpecDir(buildRoot)
 	rpmsDir := getRpmsDir(buildRoot)
 	buildDir := getBuildDir(buildRoot)
 
-	if err := filepath.Walk(buildDir, walkBuildDir); err != nil {
+	err = filepath.Walk(buildDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+
+		//This conversion is so hacky. Does convertion from int32 to octal
+		octal := strconv.FormatInt(int64(info.Mode()), 8)
+		meta := file{
+			path,
+			"0" + octal[len(octal)-3:len(octal)],
+		}
+
+		if info.IsDir() {
+			dirs = append(dirs, meta)
+		} else {
+			files = append(files, meta)
+		}
+		return nil
+
+	})
+
+	if err != nil {
 		return err
 	}
 	specFile := filepath.Join(specDir, rm.Project.Name+".spec")
@@ -207,7 +199,6 @@ func GenerateRpmSpec(rm config.ReleaseConfig, buildRoot string, scripts map[stri
 	if err != nil {
 		return err
 	}
-	defer free()
 	return nil
 }
 
@@ -224,7 +215,7 @@ func RunRpmBuild(rc config.ReleaseConfig, buildRoot string) error {
 		sign +
 		" " + specFile
 
-	fmt.Println(cmd)
+	/* fmt.Println(cmd) */
 	_, err := exec.Command("sh", "-c", cmd).Output()
 
 	return err
