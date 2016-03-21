@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 )
 
+var ErrUnknownFile = errors.New("unknown file type: valid file types are .zip, .tar")
+
 func Extract(buildDir string, req *http.Request) error {
 	stream, header, err := req.FormFile("data")
 	if err != nil {
@@ -18,7 +20,7 @@ func Extract(buildDir string, req *http.Request) error {
 			return err
 		}
 	} else {
-		return errors.New("Recieved unknown file type: valid type is .zip, got " + fileExt)
+		return ErrUnknownFile
 	}
 	defer stream.Close()
 	return nil

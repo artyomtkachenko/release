@@ -57,7 +57,7 @@ URL: {{ .ReleaseConfig.Project.ScmUrl }}
 Packager: {{ .ReleaseConfig.Project.Email }}
 
 %description
-{{ .ReleaseConfig.Project.Description }}
+{{ .ReleaseConfig.Project.Revision }}
 
 %prep
 # noop
@@ -71,11 +71,17 @@ Packager: {{ .ReleaseConfig.Project.Email }}
 %clean
 # noop
 
+%pre
+{{ index .Scripts "pre" }}
+
 %post
 {{ index .Scripts "post" }}
 
 %preun
 {{ index .Scripts "preun" }}
+
+%postun
+{{ index .Scripts "postun" }}
 
 %files
 %defattr(-,{{ .ReleaseConfig.Deploy.User }},{{ .ReleaseConfig.Deploy.Group }},-)
@@ -215,7 +221,6 @@ func RunRpmBuild(rc config.ReleaseConfig, buildRoot string) error {
 		sign +
 		" " + specFile
 
-	/* fmt.Println(cmd) */
 	_, err := exec.Command("sh", "-c", cmd).Output()
 
 	return err

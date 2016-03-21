@@ -11,38 +11,40 @@ import (
 	"testing"
 )
 
-func TestExtractSucess(t *testing.T) {
-	var ret error
-	filename := "testdata/HelloWorld.zip"
-	// fp, _ := os.Open(filename)
-	// fileInfo, _ := fp.Stat()
-
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ret = Extract("testdata/build", r)
-	}))
-	defer ts.Close()
-
+func SendMultiPart(filename, field string) (string, *bytes.Buffer) {
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
-	fileWriter, _ := bodyWriter.CreateFormFile("data", filename)
+	fileWriter, _ := bodyWriter.CreateFormFile(field, filename)
 	fh, _ := os.Open(filename)
 	defer fh.Close()
 	io.Copy(fileWriter, fh)
 
 	contentType := bodyWriter.FormDataContentType()
-	/* fmt.Printf("%+v\n", bodyBuf) */
 	bodyWriter.Close()
+	return contentType, bodyBuf
+}
 
+func TestExtractSucess(t *testing.T) {
+	var ret error
+	filename := "testdata/HelloWorld.zip"
+
+	testDir := "TestExtractSucess"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ret = Extract(testDir, r)
+	}))
+	defer ts.Close()
+
+	contentType, bodyBuf := SendMultiPart(filename, "data")
 	req, _ := http.NewRequest("POST", ts.URL, bodyBuf)
 	req.Header.Set("Content-Type", contentType)
 
 	client := &http.Client{}
 	client.Do(req)
 	testFiles := []string{
-		filepath.Join("testdata", "build", "java", "HelloWorld.jar"),
-		filepath.Join("testdata", "build", "python", "HelloWorld.py"),
-		filepath.Join("testdata", "build", "ruby", "HelloWorld.rb"),
+		filepath.Join(testDir, "java", "HelloWorld.jar"),
+		filepath.Join(testDir, "python", "HelloWorld.py"),
+		filepath.Join(testDir, "ruby", "HelloWorld.rb"),
 	}
 
 	for _, file := range testFiles {
@@ -51,5 +53,47 @@ func TestExtractSucess(t *testing.T) {
 			t.Errorf("Expected file %s to exist\n", file)
 		}
 	}
-	defer os.RemoveAll("testdata/build")
+	defer os.RemoveAll(testDir)
+}
+
+func TestExtractFailErrUnknownFile(t *testing.T) {
+	var ret error
+	filename := "testdata/simple.sh"
+
+	testDir := "TestExtractSucess"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ret = Extract(testDir, r)
+	}))
+	defer ts.Close()
+
+	contentType, bodyBuf := SendMultiPart(filename, "data")
+	req, _ := http.NewRequest("POST", ts.URL, bodyBuf)
+	req.Header.Set("Content-Type", contentType)
+
+	client := &http.Client{}
+	client.Do(req)
+	if ret != ErrUnknownFile {
+		t.Error("It should fail")
+	}
+}
+
+func TestExtractFailFormFile(t *testing.T) {
+	var ret error
+	filename := "testdata/simple.sh"
+
+	testDir := "TestExtractSucess"
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ret = Extract(testDir, r)
+	}))
+	defer ts.Close()
+
+	contentType, bodyBuf := SendMultiPart(filename, "nodata")
+	req, _ := http.NewRequest("POST", ts.URL, bodyBuf)
+	req.Header.Set("Content-Type", contentType)
+
+	client := &http.Client{}
+	client.Do(req)
+	if ret == nil {
+		t.Error("It should fail")
+	}
 }

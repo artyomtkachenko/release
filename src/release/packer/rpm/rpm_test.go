@@ -31,6 +31,22 @@ func generateTestData(path string) {
 	}
 }
 
+func Test_getBuildDir(t *testing.T) {
+	if res := getBuildDir("foo"); res != filepath.Join("foo", "BUILD") {
+		t.Error("Failed returning the right path")
+	}
+}
+func Test_specBuildDir(t *testing.T) {
+	if res := getSpecDir("foo"); res != filepath.Join("foo", "SPEC") {
+		t.Error("Failed returning the right path")
+	}
+}
+func Test_rpmsBuildDir(t *testing.T) {
+	if res := getRpmsDir("foo"); res != filepath.Join("foo", "RPMS") {
+		t.Error("Failed returning the right path")
+	}
+}
+
 func TestGenerateRpmSpec(t *testing.T) {
 	m := config.ReleaseConfig{
 		Project: config.Project{
