@@ -1,6 +1,7 @@
 package rpm
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -215,11 +216,11 @@ func RunRpmBuild(rc config.ReleaseConfig, buildRoot string) error {
 	if rc.Package.Sign {
 		sign = " --sign "
 	}
-	cmd := "rpmbuild --clean  -bb --target " +
-		rc.Project.Arch +
-		" --buildroot " + buildDir +
-		sign +
-		" " + specFile
+	cmd := fmt.Sprintf("rpmbuild --clean  -bb --target %s --buildroot %s %s %s",
+		rc.Project.Arch,
+		buildDir,
+		sign,
+		specFile)
 
 	_, err := exec.Command("sh", "-c", cmd).Output()
 

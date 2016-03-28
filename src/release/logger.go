@@ -2,21 +2,18 @@ package main
 
 import (
 	"log"
+	"log/syslog"
 	"net/http"
-	"os"
 	"time"
 )
 
 func Logger(inner http.Handler, name string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		f, err := os.OpenFile(Config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
-		if err != nil {
-			log.Fatalf("error opening file: %v", err)
+		logwriter, e := syslog.New(syslog.LOG_NOTICE, "release")
+		if e == nil {
+			log.SetOutput(logwriter)
 		}
-		defer f.Close()
-
-		log.SetOutput(f)
 
 		inner.ServeHTTP(w, r)
 

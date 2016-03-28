@@ -2,7 +2,6 @@ package config
 
 type ServerConfig struct {
 	Port    string
-	LogFile string
 	DataDir string
 	Debug   bool
 }

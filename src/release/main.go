@@ -9,6 +9,8 @@ import (
 	"release/config"
 )
 
+//
+
 var (
 	Config  config.ServerConfig
 	version string
@@ -17,7 +19,6 @@ var (
 func main() {
 	port := flag.String("port", ":8080", "A default port")
 	dataDir := flag.String("data-dir", "/data/release", "Root dir for a server ")
-	logFile := flag.String("log-file", "/var/log/release.log", "A default log file")
 	args := os.Args[1:]
 	for _, arg := range args {
 		if arg == "-v" || arg == "-version" || arg == "--version" {
@@ -29,7 +30,6 @@ func main() {
 
 	Config = config.ServerConfig{
 		Port:    *port,
-		LogFile: *logFile,
 		DataDir: *dataDir,
 	}
 
