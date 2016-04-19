@@ -8,12 +8,11 @@ import (
 )
 
 func TestExtractScriptsSucess(t *testing.T) {
-	var ret error
 	var scripts map[string]string
 	filename := "testdata/simple.sh"
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		scripts, ret = ExtractScripts(r)
+		scripts, _ = ExtractScripts(r)
 	}))
 	defer ts.Close()
 	contentType, bodyBuf := SendMultiPart(filename, "post")

@@ -26,12 +26,11 @@ func SendMultiPart(filename, field string) (string, *bytes.Buffer) {
 }
 
 func TestExtractSucess(t *testing.T) {
-	var ret error
 	filename := "testdata/HelloWorld.zip"
 
 	testDir := "TestExtractSucess"
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ret = Extract(testDir, r)
+		_ = Extract(testDir, r)
 	}))
 	defer ts.Close()
 

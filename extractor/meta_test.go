@@ -14,11 +14,10 @@ import (
 
 func TestExtractMetaSuccess(t *testing.T) {
 	var rm config.ReleaseConfig
-	var ret error
 	meta := `{"version": "1.0.0", "revision": "abd1767a214"}`
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rm, ret = ExtractMeta(r)
+		rm, _ = ExtractMeta(r)
 	}))
 	defer ts.Close()
 

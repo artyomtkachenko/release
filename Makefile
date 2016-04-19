@@ -16,7 +16,7 @@ fmt:
 vet: fmt
 		go tool vet -v ${VETARGS} $$(ls -d */ | grep -v vendor) 
 
-test:
+test: vet
 		go test -v $(TEST) -timeout=30s -parallel=4
 
 cover: test
