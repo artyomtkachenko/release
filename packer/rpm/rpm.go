@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/template"
 
-	"release/config"
+	"github.com/artyomtkachenko/release/config"
 )
 
 const (

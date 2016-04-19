@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"path/filepath"
-	"release/extractor"
-	"release/packer"
-	"release/packer/rpm"
-	"release/validate"
+
+	"github.com/artyomtkachenko/release/extractor"
+	"github.com/artyomtkachenko/release/packer"
+	"github.com/artyomtkachenko/release/packer/rpm"
+	"github.com/artyomtkachenko/release/validate"
 
 	"github.com/gorilla/mux"
 )

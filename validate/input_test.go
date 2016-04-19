@@ -3,7 +3,7 @@ package validate
 import (
 	"testing"
 
-	"release/config"
+	"github.com/artyomtkachenko/release/config"
 )
 
 func TestInput(t *testing.T) {

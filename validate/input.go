@@ -4,7 +4,8 @@ import (
 	"errors"
 	"reflect"
 	"regexp"
-	"release/config"
+
+	"github.com/artyomtkachenko/release/config"
 )
 
 type pattern struct {

@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"release/config"
+
+	"github.com/artyomtkachenko/release/config"
 )
 
 func ExtractMeta(req *http.Request) (config.ReleaseConfig, error) {

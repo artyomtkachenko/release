@@ -6,7 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"release/config"
+
+	"github.com/artyomtkachenko/release/config"
 )
 
 //

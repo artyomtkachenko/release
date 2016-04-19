@@ -5,11 +5,12 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"release/config"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/artyomtkachenko/release/config"
 )
 
 func init() {

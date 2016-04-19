@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"release/config"
 	"testing"
+
+	"github.com/artyomtkachenko/release/config"
 )
 
 func TestExtractMetaSuccess(t *testing.T) {
